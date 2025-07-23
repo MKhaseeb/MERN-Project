@@ -23,7 +23,3 @@ function App() {
 }
 
 export default App
-
-
-//auth no redirect to homepage without true login
-// the password should 
