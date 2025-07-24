@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { CompanyHome } from './Components/CompanyHome';
 import { UserHomePage } from './Components/UserHomePage';
 import AllJobLists from './Components/AllJobLists';
+import ChartsComp from './Components/ChartsComp';
 
 function App() {
   const [companyId, setCompanyId] = useState(null);
@@ -28,6 +29,7 @@ function App() {
       <Route path="/company_home" element={<CompanyHome companyId={companyId} />} />
       <Route path="/user_home" element={<UserHomePage userId={userId}/>} />
       <Route path="/allJobs" element={<AllJobLists/>} />
+      <Route path="/Charts" element={<ChartsComp/>} />
     </Routes>
   )
 }
