@@ -236,4 +236,3 @@ export default function RegisterUser({ setUserId }) {
   );
 };
 
-export default RegisterUser;
