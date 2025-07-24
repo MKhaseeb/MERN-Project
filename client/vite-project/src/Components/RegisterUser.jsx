@@ -35,6 +35,26 @@ const RegisterUser = () => {
         duration: 0.6,
         ease: "power3.inOut",
         onComplete: () => setStep((prev) => prev - 1),
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    axios
+      .post("http://localhost:8000/api/register", formData, { withCredentials: true })
+      .then(() => {
+        setMessage("");
+        setErrors({});
+        navigate("/user_home");
+      })
+      .catch((err) => {
+        const errData = err.response?.data;
+        if (errData?.errors) {
+          setErrors(errData.errors);
+        } else if (errData?.message) {
+          setMessage(errData.message);
+        } else {
+          setMessage("Something went wrong.");
+        }
       });
     }
   };
