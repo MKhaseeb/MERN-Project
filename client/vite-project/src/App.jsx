@@ -12,19 +12,22 @@ import CompanyLogin from './Components/CompanyLogin';
 import { useState } from 'react';
 import { CompanyHome } from './Components/CompanyHome';
 import { UserHomePage } from './Components/UserHomePage';
+import AllJobLists from './Components/AllJobLists';
 
 function App() {
   const [companyId, setCompanyId] = useState(null);
+  const [userId, setUserId] = useState(null);
 
   return (
     <Routes>
       <Route path="/" element={<Homecomponent />} />
-      <Route path="/register" element={<RegisterUser />} />
+      <Route path="/register" element={<RegisterUser setUserId={setUserId} />} />
       <Route path="/login" element={<LoginComponent />} />
       <Route path="/register_company" element={<CompanyRegister setCompanyId={setCompanyId} />} />
       <Route path="/login_company" element={<CompanyLogin />} />
       <Route path="/company_home" element={<CompanyHome companyId={companyId} />} />
-      <Route path="/user_home" element={<UserHomePage/>} />
+      <Route path="/user_home" element={<UserHomePage userId={userId}/>} />
+      <Route path="/allJobs" element={<AllJobLists/>} />
     </Routes>
   )
 }

@@ -21,7 +21,7 @@ module.exports = function (app) {
     app.get('/api/jobs/company/:companyId', JobController.getJobsByCompany);
 
     // routes/job.routes.js or in your controller
-    app.get('/jobs/user/:userId/applications', JobController.getUserApplications);
+    app.get('/api/jobs/user/:userId/applications', JobController.getUserApplications);
 
 
 };

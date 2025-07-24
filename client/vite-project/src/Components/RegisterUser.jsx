@@ -3,17 +3,25 @@ import gsap from "gsap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const steps = ["Account", "Contact", "Professional", "Education", "Resume"];
-
-const RegisterUser = () => {
-  const [step, setStep] = useState(0);
+export default function RegisterUser({ setUserId }) {
   const [formData, setFormData] = useState({
-    firstName: "", lastName: "", email: "", password: "", confirmPassword: "",
-    phone: "", location: "", linkedin: "", website: "",
-    desiredTitle: "", experience: "", skills: "", preferredType: "", expectedSalary: "",
-    degree: "", field: "", university: "", graduationYear: "",
-    resumeUrl: "", bio: ""
-  });
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  }); 
+// const steps = ["Account", "Contact", "Professional", "Education", "Resume"];
+
+// const RegisterUser = () => {
+//   const [step, setStep] = useState(0);
+//   const [formData, setFormData] = useState({
+//     firstName: "", lastName: "", email: "", password: "", confirmPassword: "",
+//     phone: "", location: "", linkedin: "", website: "",
+//     desiredTitle: "", experience: "", skills: "", preferredType: "", expectedSalary: "",
+//     degree: "", field: "", university: "", graduationYear: "",
+//     resumeUrl: "", bio: ""
+//   });
 
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
@@ -62,10 +70,17 @@ const RegisterUser = () => {
 
     axios
       .post("http://localhost:8000/api/register", formData, { withCredentials: true })
-      .then(() => {
+      .then((res) => {
+        const userId = res.data._id || res.data.user?._id;
+
+        if (setUserId && userId) {
+          setUserId(userId); // Store in context/state
+        }
+
+        localStorage.setItem("userId", userId); // Optional: also save to localStorage
         setMessage("");
         setErrors({});
-        navigate("/user_home");
+        navigate("/user_home", { state: { userId } }); // Optional: pass via route state
       })
       .catch((err) => {
         const errData = err.response?.data;
