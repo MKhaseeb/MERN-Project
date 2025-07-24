@@ -3,8 +3,8 @@ const Job = require('../models/JobListing.model');
 // Get all jobs
 module.exports.getAllJobs = (req, res) => {
     Job.find()
-        .populate('company') // Optional: populate company info
-        .populate('applicants') // Optional: populate applicants info
+        .populate('company') // ✅ Populates company data
+        .populate('applications.user') // ✅ Populates user info in each application
         .then(jobs => res.json(jobs))
         .catch(err => res.status(500).json({ message: 'Failed to fetch jobs', error: err }));
 };
@@ -81,4 +81,5 @@ module.exports.getUserApplications = async (req, res) => {
         res.status(500).json({ message: "Failed to fetch applications." });
     }
 };
+
 

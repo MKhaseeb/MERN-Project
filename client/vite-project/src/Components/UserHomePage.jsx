@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
-export const UserHomePage = ({ userId }) => {
+export const UserHomePage = () => {
     const [applications, setApplications] = useState([]);
+    const location = useLocation();
+    const userId = location.state?.userId || localStorage.getItem("userId");
 
     useEffect(() => {
-        axios.get(`http://localhost:8000/api/jobs/user/${userId}/applications`, { withCredentials: true })
-            .then(res => setApplications(res.data))
-            .catch(err => console.error("Failed to load user applications", err));
+        if (userId) {
+            axios.get(`http://localhost:8000/api/jobs/user/${userId}/applications`, { withCredentials: true })
+                .then(res => setApplications(res.data))
+                .catch(err => console.error("Failed to load user applications", err));
+        }
     }, [userId]);
 
     return (

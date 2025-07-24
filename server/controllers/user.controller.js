@@ -14,20 +14,22 @@ module.exports = {
     register: (req, res) => {
         User.create(req.body)
             .then(user => {
-                const userToken = jwt.sign({
-                    id: user._id
-                }, process.env.SECRET_KEY);
+                const userToken = jwt.sign({ id: user._id }, process.env.SECRET_KEY);
 
                 res
-                    .cookie("usertoken", userToken, {
-                        httpOnly: true
-                    })
-                    .json({ msg: "success!", user: user });
+                    .cookie("usertoken", userToken, { httpOnly: true })
+                    .json({
+                        msg: "success!",
+                        _id: user._id, // ✅ added explicitly
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        email: user.email
+                    });
             })
-                    .catch(err => {
-                        console.log(err);
-                        res.status(400).json({ errors: err.errors });
-    });
+            .catch(err => {
+                console.log(err);
+                res.status(400).json({ errors: err.errors });
+            });
     },
 
     login: async (req, res) => {
