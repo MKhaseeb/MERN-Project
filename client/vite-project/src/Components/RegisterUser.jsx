@@ -26,7 +26,7 @@ export default function RegisterUser() {
       .then(() => {
         setMessage("");
         setErrors({});
-        navigate("/home");
+        navigate("/user_home");
       })
       .catch((err) => {
         const errData = err.response?.data;

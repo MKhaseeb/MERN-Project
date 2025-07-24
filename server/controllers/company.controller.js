@@ -38,26 +38,19 @@ module.exports = {
             return res.status(400).json({ message: "Invalid email or password" });
         }
 
-        // if we made it this far, we found a user with this email address
-        // let's compare the supplied password to the hashed password in the database
         const correctPassword = await bcrypt.compare(req.body.password, company.password);
-
         if (!correctPassword) {
-            // password wasn't a match!
             return res.status(400).json({ message: "Invalid email or password" });
         }
-
-        // if we made it this far, the password was correct
         const companyToken = jwt.sign({
             id: company._id
         }, process.env.SECRET_KEY);
 
-        // note that the response object allows chained calls to cookie and json
         res
             .cookie("companyToken", companyToken, {
                 httpOnly: true
             })
-            .json({ msg: "success!", accountType: "company" });
+            .json({ msg: "success!", accountType: "company", companyId: company._id });
     },
 
 
@@ -66,6 +59,12 @@ module.exports = {
         res.sendStatus(200);
     }
 
+}
+
+module.exports.getCompany = (request, response) => {
+    Company.findOne({ _id: request.params.id })
+        .then(Company => response.json(Company))
+        .catch(err => response.json(err))
 }
 
 // module.exports.createAuthor = (request, response) => {
@@ -77,11 +76,7 @@ module.exports = {
 //     .catch(err => response.status(400).json(err));
 // };
 
-// module.exports.getAuthor = (request, response) => {
-//     Author.findOne({_id:request.params.id})
-//         .then(Author => response.json(Author))
-//         .catch(err => response.json(err))
-// }
+
 
 
 // module.exports.updateAuthor = (request, response) => {

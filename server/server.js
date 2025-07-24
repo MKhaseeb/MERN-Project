@@ -11,6 +11,7 @@ app.use(express.json()); // This is new
 app.use(express.urlencoded({ extended: true })); // This is new
 require('./routes/user.routes')(app);
 require("./routes/company.routes")(app);
+require("./routes/job.routes")(app);
 
 app.listen(8000, () => {
     console.log("Listening at Port 8000")

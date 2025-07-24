@@ -24,11 +24,13 @@ export default function LoginComponent() {
         setMessage("");
         setErrors({});
 
-        // Redirect based on account type returned from backend
-        if (res.data.accountType === "company") {
-          navigate("/company_homepage");
+        const { accountType, userId } = res.data;
+
+        // Redirect and pass userId via navigate state
+        if (accountType === "company") {
+          navigate("/company_homepage", { state: { userId } });
         } else {
-          navigate("/home");
+          navigate("/user_home", { state: { userId } });
         }
       })
       .catch((err) => {
