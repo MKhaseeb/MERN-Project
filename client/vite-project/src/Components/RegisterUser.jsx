@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import gsap from "gsap";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const steps = ["Account", "Contact", "Professional", "Education", "Resume"];
 
@@ -13,12 +15,28 @@ const RegisterUser = () => {
     resumeUrl: "", bio: ""
   });
 
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState("");
   const containerRef = useRef();
+  const navigate = useNavigate();
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const validateStep = () => {
+    if (step === 0) {
+      const { firstName, lastName, email, password, confirmPassword } = formData;
+      if (!firstName || !lastName || !email || !password || password !== confirmPassword) {
+        alert("Please fill out all fields correctly on this step.");
+        return false;
+      }
+    }
+    return true;
+  };
 
   const next = () => {
-    if (step < steps.length - 1) {
+    if (step < steps.length - 1 && validateStep()) {
       gsap.to(containerRef.current, {
         xPercent: -100,
         duration: 0.6,
@@ -35,6 +53,9 @@ const RegisterUser = () => {
         duration: 0.6,
         ease: "power3.inOut",
         onComplete: () => setStep((prev) => prev - 1),
+      });
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -56,7 +77,6 @@ const RegisterUser = () => {
           setMessage("Something went wrong.");
         }
       });
-    }
   };
 
   useEffect(() => {
@@ -113,86 +133,91 @@ const RegisterUser = () => {
             {Input("Phone", "phone", "text", "+970")}
             {Input("Location", "location", "text", "Ramallah, Palestine")}
             {Input("LinkedIn URL", "linkedin")}
-              {Input("Website", "website")}
-            </>
-          );
-        case 2:
-          return (
-            <>
-              {Input("Desired Job Title", "desiredTitle")}
-              {Input("Years of Experience", "experience")}
-              {Input("Skills", "skills", "text", "JavaScript, React, AI")}
-              {Input("Preferred Type", "preferredType", "text", "Remote, Full-Time")}
-              {Input("Expected Salary", "expectedSalary")}
-            </>
-          );
-        case 3:
-          return (
-            <>
-              {Input("Degree", "degree")}
-              {Input("Field", "field")}
-              {Input("University", "university")}
-              {Input("Graduation Year", "graduationYear")}
-            </>
-          );
-        case 4:
-          return (
-            <>
-              {Input("Resume URL", "resumeUrl")}
-              {TextArea("Tell us about yourself", "bio")}
-            </>
-          );
-        default:
-          return null;
-      }
-    };
+            {Input("Website", "website")}
+          </>
+        );
+      case 2:
+        return (
+          <>
+            {Input("Desired Job Title", "desiredTitle")}
+            {Input("Years of Experience", "experience")}
+            {Input("Skills", "skills", "text", "JavaScript, React, AI")}
+            {Input("Preferred Type", "preferredType", "text", "Remote, Full-Time")}
+            {Input("Expected Salary", "expectedSalary")}
+          </>
+        );
+      case 3:
+        return (
+          <>
+            {Input("Degree", "degree")}
+            {Input("Field", "field")}
+            {Input("University", "university")}
+            {Input("Graduation Year", "graduationYear")}
+          </>
+        );
+      case 4:
+        return (
+          <>
+            {Input("Resume URL", "resumeUrl")}
+            {TextArea("Tell us about yourself", "bio")}
+          </>
+        );
+      default:
+        return null;
+    }
+  };
 
-    return (
-<section className="min-h-screen 	 flex items-center justify-center p-6">
-  <div className="w-full max-w-md">
-    <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
-      <h1 className="text-center text-xl font-semibold text-gray-800">
-        Step {step + 1} of {steps.length} — {steps[step]}
-      </h1>
+  return (
+    <section className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-md">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <h1 className="text-center text-xl font-semibold text-gray-800">
+            Step {step + 1} of {steps.length} — {steps[step]}
+          </h1>
 
-      <div ref={containerRef} className="transition-transform ease-in-out duration-700 space-y-5">
-        {renderStep()}
+          <div
+            key={step}
+            ref={containerRef}
+            className="transition-transform ease-in-out duration-700 space-y-5"
+          >
+            {renderStep()}
+          </div>
+
+          <div className="flex justify-between items-center pt-4">
+            {step > 0 ? (
+              <button
+                type="button"
+                onClick={prev}
+                className="text-sm text-gray-600 hover:text-blue-600"
+              >
+                Back
+              </button>
+            ) : (
+              <span />
+            )}
+
+            {step < steps.length - 1 ? (
+              <button
+                type="button"
+                onClick={next}
+                className="bg-[#0a66c2] hover:bg-[#004182] text-white font-bold text-sm px-6 py-2 rounded-full"
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-6 py-2 rounded-full"
+              >
+                Submit
+              </button>
+            )}
+          </div>
+
+          {message && <p className="text-red-500 text-sm text-center">{message}</p>}
+        </form>
       </div>
-
-      <div className="flex justify-between items-center pt-4">
-        {step > 0 ? (
-          <button
-            type="button"
-            onClick={prev}
-            className="text-sm text-gray-600 hover:text-blue-600"
-          >
-            Back
-          </button>
-        ) : (
-          <span />
-        )}
-
-        {step < steps.length - 1 ? (
-          <button
-            type="button"
-            onClick={next}
-            className="bg-[#0a66c2] hover:bg-[#004182] text-white font-bold text-sm px-6 py-2 rounded-full"
-          >
-            Next
-          </button>
-        ) : (
-          <button
-            type="submit"
-            className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-6 py-2 rounded-full"
-          >
-            Submit
-          </button>
-        )}
-      </div>
-    </form>
-  </div>
-</section>
-
+    </section>
   );
 };
 
