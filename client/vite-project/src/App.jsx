@@ -14,6 +14,7 @@ import { CompanyHome } from './Components/CompanyHome';
 import { UserHomePage } from './Components/UserHomePage';
 import AllJobLists from './Components/AllJobLists';
 import ChartsComp from './Components/ChartsComp';
+import { DataqueueWidget } from './Components/DataqueueWidget';
 import CreateJobPage from './Components/CreateJobPage';
 import ApplyComponent from './Components/ApplyComponent';
 
@@ -34,6 +35,8 @@ function App() {
       <Route path="/user_home" element={<UserHomePage userId={userId}/>} />
       <Route path="/allJobs" element={<AllJobLists/>} />
       <Route path="/Charts" element={<ChartsComp/>} />
+      <Route path="/queue" element={<DataqueueWidget/>} />
+
       <Route path="/apply/:id" element={<ApplyComponent/>} />
     </Routes>
   )
