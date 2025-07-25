@@ -54,7 +54,7 @@ const Homecomponent = () => {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "top top",
-          end: "+=1000",
+          end: "+=2000",
           scrub: true,
           pin: true,
           anticipatePin: 1,
