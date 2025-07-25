@@ -7,6 +7,7 @@ import { loadFull } from "tsparticles";
 import { loadPolygonMaskPlugin } from "tsparticles-plugin-polygon-mask";
 import UnemploymentChart from './UnemploymentChart';
 import backgroundImage from '../assets/dw.webp'
+import { Link } from "react-router-dom";
 
 
 const particlesInit = async (engine) => {
@@ -95,7 +96,8 @@ const Homecomponent = () => {
       className="w-full h-full"
       options={{
         fullScreen: false,
-        background: { color: "#1f2937" },
+        background: { color: "#1f2937" }, 
+        // #0f1214
         particles: {
           number: { value: 200 },
           color: { value: "#ffffffff" },
@@ -133,7 +135,7 @@ const Homecomponent = () => {
       </p>
       <div className="flex gap-6 justify-center md:justify-start">
         <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-md font-semibold">
-          Get Started
+          <Link to={'/alljobs'}>Get Started </Link>
         </button>
         <button className="border border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white px-6 py-3 rounded-md font-semibold">
           Explore Jobs
