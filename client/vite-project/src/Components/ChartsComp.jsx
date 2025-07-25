@@ -200,11 +200,12 @@ const ChartsComp = () => {
             for (const keyword of keywords) {
                 try {
                     const jRes = await fetch(
-                        `https://jsearch.p.rapidapi.com/search?query=${keyword}&num_pages=1`,
+                        // https://jsearch.p.rapidapi.com/search?query=${keyword}%20jobs&page=1&num_pages=1&date_posted=all
+                        `https://jsearch.p.rapidapi.com/search?query=${keyword}%20jobs&page=1&num_pages=1&date_posted=all`,
                         {
                             method: 'GET',
                             headers: {
-                                'X-RapidAPI-Key': '122b47ca20mshec5ac4f4f93d8e9p14a694jsn21fb47609cd8',
+                                'X-RapidAPI-Key': 'b4232c55e1msh2fa179ace936293p15516djsn3b98c2ac71c2',
                                 'X-RapidAPI-Host': 'jsearch.p.rapidapi.com',
                             },
                         }
