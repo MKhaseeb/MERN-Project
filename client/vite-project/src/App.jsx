@@ -1,6 +1,6 @@
 // import { useState } from 'react'
 // import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+// import viteLogo from '/vite.svg'
 // import viteL from '/palestine.svg'
 import './App.css'
 import { Routes, Route, Link } from "react-router-dom";
@@ -15,6 +15,9 @@ import { UserHomePage } from './Components/UserHomePage';
 import AllJobLists from './Components/AllJobLists';
 import ChartsComp from './Components/ChartsComp';
 import { DataqueueWidget } from './Components/DataqueueWidget';
+import CreateJobPage from './Components/CreateJobPage';
+import ApplyComponent from './Components/ApplyComponent';
+
 
 function App() {
   const [companyId, setCompanyId] = useState(null);
@@ -28,11 +31,13 @@ function App() {
       <Route path="/register_company" element={<CompanyRegister setCompanyId={setCompanyId} />} />
       <Route path="/login_company" element={<CompanyLogin />} />
       <Route path="/company_home" element={<CompanyHome companyId={companyId} />} />
+      <Route path="/create-job" element={<CreateJobPage />} />
       <Route path="/user_home" element={<UserHomePage userId={userId}/>} />
       <Route path="/allJobs" element={<AllJobLists/>} />
       <Route path="/Charts" element={<ChartsComp/>} />
       <Route path="/queue" element={<DataqueueWidget/>} />
 
+      <Route path="/apply/:id" element={<ApplyComponent/>} />
     </Routes>
   )
 }
