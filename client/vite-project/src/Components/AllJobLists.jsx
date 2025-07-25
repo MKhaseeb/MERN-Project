@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaSearch, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
 import Hero from "../assets/Hero2.png";
+import { Link } from "react-router-dom";
+import ApplyModal from "./ApplyModal";
+import LogoutButton from "./LogoutButton";
+
 
 // Sample data for dropdown filters
 const FILTER_OPTIONS = {
@@ -23,6 +27,8 @@ export default function JobListingPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [locationQuery, setLocationQuery] = useState("");
     const [selectedJob, setSelectedJob] = useState(null);
+    const [showApplyModal, setShowApplyModal] = useState(false);
+
 
     // Dropdowns
     const [dropdownStates, setDropdownStates] = useState({});
@@ -91,8 +97,14 @@ export default function JobListingPage() {
     return (
         <div className="min-h-screen bg-[#0f1214] text-white">
             {/* Navbar */}
-            <nav className="bg-[#0f1214] border-b border-gray-800 px-6 py-4 shadow-sm">
+            <nav className="bg-[#0f1214] border-b border-gray-800 px-6 py-4 shadow-sm flex justify-between items-center">
                 <h1 className="text-2xl font-bold tracking-wide text-white">Job Plus</h1>
+                <div>
+                    <Link to="/user_home" className="text-white hover:underline">My applications</Link>
+                    <Link to="/alljobs" className="text-white hover:underline">Home</Link>
+                    <LogoutButton />
+
+                </div>
             </nav>
 
             {/* Hero Section */}
@@ -181,8 +193,8 @@ export default function JobListingPage() {
                                                 key={value}
                                                 onClick={() => selectFilter(label, value)}
                                                 className={`block w-full text-left px-4 py-2 text-sm hover:bg-[#2c343c] ${filters[label] === value
-                                                        ? "bg-[#2c343c] text-white"
-                                                        : "text-gray-300"
+                                                    ? "bg-[#2c343c] text-white"
+                                                    : "text-gray-300"
                                                     }`}
                                             >
                                                 {label === "Pay" ? `$${value}+` : value}
@@ -251,12 +263,41 @@ export default function JobListingPage() {
                                 ) : (
                                     <p className="text-gray-500">No requirements listed.</p>
                                 )}
+                                {showApplyModal && selectedJob && (
+                                    <ApplyModal
+                                        jobTitle={selectedJob.title}
+                                        onClose={() => setShowApplyModal(false)}
+                                        onSubmit={(formData) => {
+                                            const userId = localStorage.getItem("userId"); // خذ من التخزين المحلي
+                                            if (!userId) {
+                                                alert("Please login first.");
+                                                return;
+                                            }
+
+                                            // إذا formData هو FormData
+                                            const token = localStorage.getItem("token"); // أو من المكان اللي تخزن فيه التوكن
+                                            axios.post(`http://localhost:8000/api/jobs/${selectedJob._id}/apply`, formData, {
+                                                headers: {
+                                                    "Content-Type": "multipart/form-data",
+                                                    Authorization: `Bearer ${token}`
+                                                },
+                                                withCredentials: true,
+                                            })
+                                                .then(() => alert("Application submitted successfully!"))
+                                                .catch(() => alert("Failed to submit application."));
+                                        }}
+                                    />
+                                )}
                             </div>
 
                             <div className="pt-4 border-t border-gray-700">
-                                <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold w-full">
-                                    Apply on Company Site
+                                <button
+                                    onClick={() => setShowApplyModal(true)}
+                                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold w-full"
+                                >
+                                    Apply Now
                                 </button>
+
                             </div>
                         </div>
                     ) : (

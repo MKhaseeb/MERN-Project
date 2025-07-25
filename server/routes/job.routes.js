@@ -1,5 +1,13 @@
-const { Router } = require('express');
 const JobController = require('../controllers/job.controller');
+const multer = require('multer');
+const bodyParser = require('body-parser'); // Add for form data parsing
+const auth = require("../middleware/authenticate");
+
+// Configure multer for file uploads
+const upload = multer({
+    dest: 'uploads/',
+    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+});
 
 module.exports = function (app) {
     // Get all jobs
@@ -17,11 +25,18 @@ module.exports = function (app) {
     // Delete a job
     app.delete('/api/jobs/:id', JobController.deleteJob);
 
-    // In routes/job.routes.js
+    // Get jobs by company
     app.get('/api/jobs/company/:companyId', JobController.getJobsByCompany);
 
-    // routes/job.routes.js or in your controller
+    // Get user applications
     app.get('/api/jobs/user/:userId/applications', JobController.getUserApplications);
 
-
+    // Apply to job with file upload
+    app.post(
+        "/api/jobs/:jobId/apply",
+        auth,                           // Authentication middleware
+        bodyParser.urlencoded({ extended: true }), // Parse form data
+        upload.single('cv'),            // Handle file upload
+        JobController.applyToJob        // Controller
+    );
 };
