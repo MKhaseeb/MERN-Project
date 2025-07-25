@@ -11,10 +11,10 @@ export default function RegisterUser({ setUserId }) {
     password: "",
     confirmPassword: "",
   }); 
-// const steps = ["Account", "Contact", "Professional", "Education", "Resume"];
+const steps = ["Account", "Contact", "Professional", "Education", "Resume"];
 
 // const RegisterUser = () => {
-//   const [step, setStep] = useState(0);
+  const [step, setStep] = useState(0);
 //   const [formData, setFormData] = useState({
 //     firstName: "", lastName: "", email: "", password: "", confirmPassword: "",
 //     phone: "", location: "", linkedin: "", website: "",
