@@ -1,4 +1,4 @@
-const { User } = require('../models/user.model');
+const User = require('../models/User.model');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
@@ -55,11 +55,19 @@ module.exports = {
         }, process.env.SECRET_KEY);
 
         // note that the response object allows chained calls to cookie and json
-        res
-            .cookie("usertoken", userToken, {
-                httpOnly: true
-            })
-            .json({ msg: "success!", accountType: "user" });
+        res.cookie("usertoken", userToken, {
+            httpOnly: true,
+            sameSite: "Lax",
+            secure: false // true إذا على https
+        })
+            .json({
+                msg: "success!",
+                accountType: "user",
+                userId: user._id, // ⬅️ مهم جداً
+                token: userToken, // 👈 أضف هذه
+
+            });
+
     },
 
 
