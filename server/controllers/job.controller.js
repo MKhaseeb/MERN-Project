@@ -175,7 +175,7 @@ module.exports = {
                 req.io.to(job.company._id.toString()).emit("newApplication", {
                     message,
                     jobId,
-                    userName: user.fullName || user.name,
+                    userName: user.firstName +" " + user.lastName || user.name,
                     jobTitle: job.title
                 });
 
