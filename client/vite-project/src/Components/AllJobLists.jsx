@@ -291,19 +291,19 @@ export default function JobListingPage() {
                             </div>
 
                             <div className="pt-4 border-t border-gray-700">
-
+{/* 
                                 <Link to={{ pathname: `/apply/${selectedJob._id}`, state: { job: selectedJob } }}>
                                     <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded mt-4">
                                         Apply Now
                                     </button>
-                                </Link>
+                                </Link> */}
 
-//                                 <button
-//                                     onClick={() => setShowApplyModal(true)}
-//                                     className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold w-full"
-//                                 >
-//                                     Apply Now
-//                                 </button>
+                          <button
+                                    onClick={() => setShowApplyModal(true)}
+                                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold w-full"
+                                >
+                                    Apply Now
+                                </button>
 
 
                             </div>
