@@ -1,6 +1,38 @@
 const Job = require('../models/JobListing.model');
 const Application = require('../models/Application'); // Add this import
 const User = require('../models/user.model'); // Add this import
+const { Server } = require("socket.io");
+
+
+const getApplicantsForJob = async (req, res) => {
+    const { jobId } = req.params;
+
+    try {
+        // Find all applications for this job, and populate user info
+        const applications = await Application.find({ job: jobId })
+            .populate({
+                path: 'user',
+                select: 'name email firstName lastName'
+            });
+
+        // Map to desired output: include user info + CV + coverLetter
+        const applicants = applications.map(app => ({
+            applicationId: app._id,
+            name: app.user?.name || `${app.user?.firstName || ''} ${app.user?.lastName || ''}`.trim(),
+            email: app.user?.email || 'No email',
+            cvPath: app.cvPath,
+            cvOriginalName: app.cvOriginalName,
+            coverLetter: app.coverLetter || '',
+            appliedAt: app.appliedAt || '',
+        }));
+
+        res.json(applicants);
+    } catch (err) {
+        console.error('Error fetching applicants:', err);
+        res.status(500).json({ message: 'Failed to fetch applicants' });
+    }
+};
+
 
 module.exports = {
     // Get all jobs
@@ -108,24 +140,20 @@ module.exports = {
                 return res.status(400).json({ message: 'CV file is required' });
             }
 
-            // Find the job to get company reference
-            const job = await Job.findById(jobId);
+            // Get job + company
+            const job = await Job.findById(jobId).populate('company');
             if (!job) return res.status(404).json({ message: 'Job not found' });
 
-            // Check if user already applied
-            const existingApplication = await Application.findOne({
-                job: jobId,
-                user: userId
-            });
-
+            // Check if already applied
+            const existingApplication = await Application.findOne({ job: jobId, user: userId });
             if (existingApplication) {
                 return res.status(400).json({ message: 'Already applied to this job' });
             }
 
-            // Create new application
+            // Save new application
             const newApplication = new Application({
                 user: userId,
-                company: job.company, // Use company from job
+                company: job.company._id,
                 job: jobId,
                 coverLetter,
                 cvPath: cvFile.path,
@@ -134,23 +162,39 @@ module.exports = {
 
             const savedApplication = await newApplication.save();
 
-            // Add application to job's applications array
-            await Job.findByIdAndUpdate(jobId, {
-                $push: { applications: savedApplication._id }
-            });
+            // Update references
+            await Job.findByIdAndUpdate(jobId, { $push: { applications: savedApplication._id } });
+            await User.findByIdAndUpdate(userId, { $push: { applications: savedApplication._id } });
 
-            // Add application to user's applications array
-            await User.findByIdAndUpdate(userId, {
-                $push: { applications: savedApplication._id }
-            });
+            // 🔔 Emit real-time notification via Socket.IO
+            const user = await User.findById(userId);
+            const message = `${user.fullName || user.name || 'A user'} applied to your job: ${job.title}`;
+
+            // Make sure Socket.IO instance is attached to request
+            if (req.io) {
+                req.io.to(job.company._id.toString()).emit("newApplication", {
+                    message,
+                    jobId,
+                    userName: user.fullName || user.name,
+                    jobTitle: job.title
+                });
+
+                console.log("📢 Notification emitted to company:", job.company._id.toString());
+            } else {
+                console.warn("⚠️ Socket.IO not available on req");
+            }
 
             res.status(201).json({
                 message: 'Application submitted successfully',
                 applicationId: savedApplication._id
             });
+
         } catch (err) {
             console.error('Error applying to job:', err);
             res.status(500).json({ message: 'Server error', error: err.message });
         }
-    }
+    },
+
+    // Updated function: getApplicantsForJob
+    getApplicantsForJob
 };

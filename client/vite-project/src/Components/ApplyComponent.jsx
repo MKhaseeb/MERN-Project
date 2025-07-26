@@ -72,9 +72,9 @@ export default function ApplyComponent() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { fullName, email, coverLetter, cv } = formData;
 
-        if (!fullName || !email || !coverLetter || !cv) {
+        // Validation: Check for cover letter and CV
+        if (!formData.coverLetter || !formData.cv) {
             alert("Please complete all fields and upload your CV.");
             return;
         }
@@ -87,14 +87,12 @@ export default function ApplyComponent() {
             return;
         }
 
-        const data = new FormData();
-        data.append("cv", cv);
-        data.append("coverLetter", coverLetter);
-        data.append("fullName", fullName);
-        data.append("email", email);
+        const form = new FormData();
+        form.append("coverLetter", formData.coverLetter);
+        form.append("cv", formData.cv);
 
         try {
-            await axios.post(`http://localhost:8000/api/jobs/${id}/apply`, data, {
+            await axios.post(`http://localhost:8000/api/jobs/${id}/apply`, form, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     Authorization: `Bearer ${token}`,
@@ -102,13 +100,12 @@ export default function ApplyComponent() {
                 withCredentials: true,
             });
 
-            alert("Application submitted successfully!");
+            alert("✅ Application submitted successfully!");
             navigate("/user_home");
         } catch (error) {
-            console.error("Application error:", error);
-            alert("Failed to submit application.");
-
-
+            console.error("❌ Application error:", error.response?.data || error.message);
+            const errorMessage = error.response?.data?.message || "Failed to submit application.";
+            alert(`❌ ${errorMessage}`);
         }
     };
 
@@ -129,6 +126,7 @@ export default function ApplyComponent() {
                     <form onSubmit={handleSubmit}>
                         <div className="space-y-5">
                             <div>
+                                <label className="text-gray-400">Full Name</label>
                                 <input
                                     type="text"
                                     className="w-full mt-2 px-4 py-2 rounded-xl bg-[#20252a] text-gray-300 border border-gray-600 cursor-not-allowed"
@@ -202,7 +200,7 @@ export default function ApplyComponent() {
                 {/* Right: Job Details */}
                 <div className="w-3/5 bg-[#161a1d] p-8 rounded-lg border border-gray-800 shadow-xl sticky top-8">
                     <h2 className="text-3xl font-bold text-white mb-1">{job.title}</h2>
-                    <p className="text-gray-400">{job.company?.name}</p>
+                    <p className="text-gray-400">{job.company?.companyName || job.company?.name || "Unknown Company"}</p>
                     <div className="flex gap-4 mt-2 text-sm text-gray-500">
                         <span><FaMapMarkerAlt className="inline mr-1 text-blue-400" />{job.location}</span>
                         <span><FaCalendarAlt className="inline mr-1 text-purple-400" />{new Date(job.createdAt).toLocaleDateString()}</span>

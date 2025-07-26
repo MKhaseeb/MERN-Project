@@ -25,6 +25,7 @@ import {
 } from 'chart.js';
 import JobTable from './JobTable'; // ✅ Import redesigned JobTable
 import CreateJobPage from './CreateJobPage'; // ✅ Add CreateJobPage for integrated access
+import LogoutButton from './LogoutButton';
 
 ChartJS.register(
   CategoryScale,
@@ -124,6 +125,8 @@ export const CompanyHome = () => {
         <SidebarButton icon={<FaClipboardList />} label="Jobs" setActiveTab={setActiveTab} activeTab={activeTab} tabName="jobs" />
         <SidebarButton icon={<FaUserFriends />} label="Applications" setActiveTab={setActiveTab} activeTab={activeTab} tabName="applications" />
         <SidebarButton icon={<FaBuilding />} label="Company Profile" setActiveTab={setActiveTab} activeTab={activeTab} tabName="profile" />
+        <LogoutButton />
+
       </aside>
 
       {/* Main Content */}
@@ -208,9 +211,8 @@ export const CompanyHome = () => {
 const SidebarButton = ({ icon, label, setActiveTab, activeTab, tabName }) => (
   <button
     onClick={() => setActiveTab(tabName)}
-    className={`flex items-center gap-2 w-full px-4 py-2 rounded transition-all text-left ${
-      activeTab === tabName ? 'bg-[#1c1f23] font-semibold' : 'hover:bg-[#1c1f23]'
-    }`}
+    className={`flex items-center gap-2 w-full px-4 py-2 rounded transition-all text-left ${activeTab === tabName ? 'bg-[#1c1f23] font-semibold' : 'hover:bg-[#1c1f23]'
+      }`}
   >
     {icon} {label}
   </button>

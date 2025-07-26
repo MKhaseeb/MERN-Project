@@ -6,10 +6,6 @@ const CompanySchema = new mongoose.Schema({
         type: String,
         required: [true, "Company name is required"]
     },
-    phonenumber: {
-        type: String,
-        required: [true, "Phone number is required"]
-    },
     details: {
         type: String,
         required: [true, "Details are required"]
@@ -42,9 +38,6 @@ const CompanySchema = new mongoose.Schema({
         type: String,
         required: [true, "Password is required"],
         minlength: [8, "Password must be 8 characters or longer"]
-    },
-    website: {
-        type: String
     },
     jobListings: [{
         type: mongoose.Schema.Types.ObjectId,

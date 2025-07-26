@@ -45,10 +45,10 @@ export default function JobListingPage() {
         setFilters((prev) => ({ ...prev, [key]: value }));
         setDropdownStates((prev) => ({ ...prev, [key]: false }));
     };
-    
+
 
     useEffect(() => {
-        
+
         axios.get("http://localhost:8000/api/jobs", { withCredentials: true })
             .then((res) => setJobs(res.data))
             .catch((err) => {
@@ -230,22 +230,30 @@ export default function JobListingPage() {
                                 )}
                             </div>
                             <div className="pt-4 border-t border-gray-700">
-                                <button
-                                    onClick={handleApplyClick}
-
-{/* 
-                                <Link to={{ pathname: `/apply/${selectedJob._id}`, state: { job: selectedJob } }}>
-                                    <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded mt-4">
+                                <div className="pt-4 border-t border-gray-700">
+                                    <button
+                                        onClick={handleApplyClick}
+                                        className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold w-full"
+                                    >
                                         Apply Now
                                     </button>
-                                </Link> */}
 
-                          <button
+                                    {/* 
+    بديل باستخدام <Link>:
+    <Link to={{ pathname: `/apply/${selectedJob._id}`, state: { job: selectedJob } }}>
+        <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded mt-4">
+            Apply Now
+        </button>
+    </Link> 
+    */}
+                                </div>
+
+                                {/* <button
                                     onClick={() => setShowApplyModal(true)}
                                     className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold w-full"
                                 >
                                     Apply Now
-                                </button>
+                                </button> */}
                             </div>
                         </div>
                     ) : (

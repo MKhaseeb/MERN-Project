@@ -1,4 +1,4 @@
-const { Company } = require('../models/company.model');
+const Company = require('../models/company.model');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
@@ -68,11 +68,11 @@ module.exports.getCompany = (request, response) => {
 }
 
 module.exports.getApplicationsByCompany = async (req, res) => {
-  try {
-    const { companyId } = req.params;
-    const applications = await Application.find({ companyId }); // تأكد من أن اسم الحقل صحيح
-    res.status(200).json(applications);
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
+    try {
+        const { companyId } = req.params;
+        const applications = await Application.find({ companyId }); // تأكد من أن اسم الحقل صحيح
+        res.status(200).json(applications);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error });
+    }
 };
