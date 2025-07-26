@@ -1,6 +1,11 @@
 @import "tailwindcss";
 
 
+*, html {
+
+    scroll-behavior: smooth !important;
+}
+
 @keyframes blob {
   0%, 100% {
     transform: translate(0px, 0px) scale(1);

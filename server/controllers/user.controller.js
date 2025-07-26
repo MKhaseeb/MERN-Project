@@ -2,13 +2,11 @@ const User = require('../models/User.model');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
-
 module.exports = {
-
-    index: (request, response) => {
+    index: (req, res) => {
         User.find()
-            .then(allUsers => response.json(allUsers))
-            .catch(err => response.status(400).json(err));
+            .then(allUsers => res.json(allUsers))
+            .catch(err => res.status(400).json(err));
     },
 
     register: (req, res) => {
@@ -20,7 +18,7 @@ module.exports = {
                     .cookie("usertoken", userToken, { httpOnly: true })
                     .json({
                         msg: "success!",
-                        _id: user._id, // ✅ added explicitly
+                        _id: user._id,
                         firstName: user.firstName,
                         lastName: user.lastName,
                         email: user.email
@@ -35,48 +33,52 @@ module.exports = {
     login: async (req, res) => {
         const user = await User.findOne({ email: req.body.email });
 
-        if (user === null) {
-            // email not found in users collection
+        if (!user) {
             return res.status(400).json({ message: "Invalid email or password" });
         }
 
-        // if we made it this far, we found a user with this email address
-        // let's compare the supplied password to the hashed password in the database
         const correctPassword = await bcrypt.compare(req.body.password, user.password);
 
         if (!correctPassword) {
-            // password wasn't a match!
             return res.status(400).json({ message: "Invalid email or password" });
         }
 
-        // if we made it this far, the password was correct
-        const userToken = jwt.sign({
-            id: user._id
-        }, process.env.SECRET_KEY);
+        const userToken = jwt.sign({ id: user._id }, process.env.SECRET_KEY);
 
-        // note that the response object allows chained calls to cookie and json
         res.cookie("usertoken", userToken, {
             httpOnly: true,
             sameSite: "Lax",
-            secure: false // true إذا على https
-        })
-            .json({
-                msg: "success!",
-                accountType: "user",
-                userId: user._id, // ⬅️ مهم جداً
-                token: userToken, // 👈 أضف هذه
-
-            });
-
+            secure: false
+        }).json({
+            msg: "success!",
+            accountType: "user",
+            userId: user._id,
+            token: userToken
+        });
     },
-
 
     logout: (req, res) => {
         res.clearCookie('usertoken');
         res.sendStatus(200);
-    }
+    },
 
-}
+    // ✅ This is the method you need to fetch user info by ID
+    getUserById: async (req, res) => {
+        try {
+            const user = await User.findById(req.params.id).select("firstName lastName email");
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+
+            res.json(user);
+        } catch (err) {
+            console.error("User fetch error:", err);
+            res.status(500).json({ message: "Server error" });
+        }
+    }
+};
+
+
 
 // module.exports.createAuthor = (request, response) => {
 //     const {name } = request.body;

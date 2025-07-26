@@ -6,6 +6,7 @@ module.exports = function (app) {
     app.post('/api/register', UserController.register);
     app.post('/api/login', UserController.login);
     app.post('/api/logout', UserController.logout);
+    app.get('/api/users/:id', UserController.getUserById);
     app.post('/api/logout', (req, res) => {
         req.session.destroy((err) => {
             if (err) {
