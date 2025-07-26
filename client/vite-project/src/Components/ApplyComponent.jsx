@@ -33,10 +33,36 @@ export default function ApplyComponent() {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Handle form submission (e.g., send to the server)
-        console.log("Form data submitted:", formData);
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Please login first.");
+            return;
+        }
+
+        const form = new FormData();
+        form.append("coverLetter", formData.coverLetter);
+        form.append("cv", formData.cv);
+
+        try {
+            await axios.post(
+                `http://localhost:8000/api/jobs/${job._id}/apply`,
+                form,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        Authorization: `Bearer ${token}`
+                    },
+                    withCredentials: true,
+                }
+            );
+            alert("✅ Application submitted!");
+        } catch (err) {
+            console.error("❌ Failed to submit:", err.response?.data || err.message);
+            alert(err?.response?.data?.message || "Error while submitting application");
+        }
     };
 
     if (!job) {

@@ -67,29 +67,12 @@ module.exports.getCompany = (request, response) => {
         .catch(err => response.json(err))
 }
 
-
-
-// module.exports.createAuthor = (request, response) => {
-//     const {name } = request.body;
-//     Author.create({
-//         name
-//     })
-//     .then(Author => response.json(Author))
-//     .catch(err => response.status(400).json(err));
-// };
-
-
-
-
-// module.exports.updateAuthor = (request, response) => {
-//     Author.findOneAndUpdate({_id: request.params.id}, request.body, {new:true})
-//         .then(updatedAuthor => response.json(updatedAuthor))
-//         .catch(err => response.json(err))
-// }
-
-// module.exports.deleteAuthor = (request, response) => {
-//     Author.deleteOne({ _id: request.params.id })
-//         .then(deleteConfirmation => response.json(deleteConfirmation))
-//         .catch(err => response.json(err))
-// }
-
+module.exports.getApplicationsByCompany = async (req, res) => {
+  try {
+    const { companyId } = req.params;
+    const applications = await Application.find({ companyId }); // تأكد من أن اسم الحقل صحيح
+    res.status(200).json(applications);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};

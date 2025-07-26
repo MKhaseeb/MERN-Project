@@ -6,4 +6,6 @@ module.exports = function (app) {
     app.post('/api/company/register', CompanyController.register); // Register company
     app.post('/api/company/login', CompanyController.login);       // Login company
     app.post('/api/company/logout', CompanyController.logout);     // Logout company
+    app.get('/api/applications/company/:companyId', CompanyController.getApplicationsByCompany);
+
 };
