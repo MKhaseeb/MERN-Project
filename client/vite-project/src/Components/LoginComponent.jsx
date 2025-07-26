@@ -19,12 +19,18 @@ export default function LoginComponent() {
             withCredentials: true,
         })
             .then((res) => {
-                const { accountType, userId,token } = res.data;
+                const { accountType, userId, token, firstName, lastName, email } = res.data;
 
-                // ✅ خزّن البيانات في التخزين المحلي
+                // Store user info
                 localStorage.setItem("userId", userId);
                 localStorage.setItem("accountType", accountType);
-                localStorage.setItem("token", token); // 👈 أضف هذه
+                localStorage.setItem("token", token);
+                const safeFullName = `${firstName || ""} ${lastName || ""}`.trim();
+
+                localStorage.setItem("user", JSON.stringify({
+                    fullName: safeFullName,
+                    email: email || "",
+                }));
 
 
                 if (accountType === "company") {
