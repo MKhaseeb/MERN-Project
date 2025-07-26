@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const CreateJobPage = () => {
@@ -22,7 +22,7 @@ const CreateJobPage = () => {
                 company: companyId,
                 requirements: job.requirements.split(',').map(r => r.trim())
             }, { withCredentials: true });
-            navigate('/company');
+            navigate('/company_home');
         } catch (err) {
             alert("❌ Failed to create job");
             console.error(err);

@@ -31,7 +31,16 @@ const ApplicationSchema = new Schema({
     },
     appliedAt: {
         type: Date,
-        default: Date.now
+        default: () => {
+            const now = new Date();
+            now.setHours(0, 0, 0, 0); // zero out time
+            return now;
+        },
+        set: v => {
+            const d = new Date(v);
+            d.setHours(0, 0, 0, 0);
+            return d;
+        }
     }
 }, { timestamps: true });
 

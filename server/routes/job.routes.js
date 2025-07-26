@@ -39,4 +39,8 @@ module.exports = function (app) {
         upload.single('cv'),            // Handle file upload
         JobController.applyToJob        // Controller
     );
+    app.get('/api/jobs/:jobId/applicants', JobController.getApplicantsForJob);
+
+
+
 };

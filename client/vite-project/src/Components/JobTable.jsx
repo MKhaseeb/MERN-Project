@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-// import { Menu } from '@headlessui/react';
+import { Menu } from '@headlessui/react';
 import { FaEllipsisV } from 'react-icons/fa';
+import JobApplicants from './JobApplicant'; // Import your JobApplicants component
 
 const JobTable = ({ jobs, setJobs, selectedJobId, setSelectedJobId }) => {
   const [selectedJobs, setSelectedJobs] = useState([]);
   const [filterStatus, setFilterStatus] = useState('all');
+
+  // New state to track which job's applicants modal is open
+  const [modalJobId, setModalJobId] = useState(null);
 
   const filteredJobs = jobs.filter(job => {
     if (filterStatus === 'all') return true;
@@ -43,9 +47,8 @@ const JobTable = ({ jobs, setJobs, selectedJobId, setSelectedJobId }) => {
             <button
               key={status}
               onClick={() => setFilterStatus(status)}
-              className={`px-3 py-1 rounded capitalize ${
-                filterStatus === status ? 'bg-blue-600' : 'bg-gray-800 hover:bg-gray-700'
-              }`}
+              className={`px-3 py-1 rounded capitalize ${filterStatus === status ? 'bg-blue-600' : 'bg-gray-800 hover:bg-gray-700'
+                }`}
             >
               {status}
             </button>
@@ -61,9 +64,8 @@ const JobTable = ({ jobs, setJobs, selectedJobId, setSelectedJobId }) => {
                   {({ active }) => (
                     <button
                       onClick={() => handleBulkStatusChange(status)}
-                      className={`block px-4 py-2 text-sm w-full text-left capitalize ${
-                        active ? 'bg-gray-700' : ''
-                      }`}
+                      className={`block px-4 py-2 text-sm w-full text-left capitalize ${active ? 'bg-gray-700' : ''
+                        }`}
                     >
                       {status === 'active' ? 'Reopen jobs' : `${status.charAt(0).toUpperCase() + status.slice(1)} jobs`}
                     </button>
@@ -114,9 +116,8 @@ const JobTable = ({ jobs, setJobs, selectedJobId, setSelectedJobId }) => {
                 <td className="p-2">{job.location}</td>
                 <td className="p-2">{job.salaryRange}</td>
                 <td className="p-2 capitalize">
-                  <span className={`px-2 py-1 rounded-full text-sm font-medium ${
-                    job.status === 'active' ? 'bg-green-600' : job.status === 'paused' ? 'bg-yellow-500' : 'bg-red-500'
-                  }`}>
+                  <span className={`px-2 py-1 rounded-full text-sm font-medium ${job.status === 'active' ? 'bg-green-600' : job.status === 'paused' ? 'bg-yellow-500' : 'bg-red-500'
+                    }`}>
                     {job.status}
                   </span>
                 </td>
@@ -125,15 +126,32 @@ const JobTable = ({ jobs, setJobs, selectedJobId, setSelectedJobId }) => {
                     <Menu.Button className="text-white hover:text-gray-300" onClick={(e) => e.stopPropagation()}>
                       <FaEllipsisV />
                     </Menu.Button>
-                    <Menu.Items className="absolute right-0 mt-1 w-32 bg-[#1c1f23] border border-gray-700 rounded shadow-md z-20">
+                    <Menu.Items className="absolute right-0 mt-1 w-40 bg-[#1c1f23] border border-gray-700 rounded shadow-md z-20">
                       <Menu.Item>
                         {({ active }) => (
-                          <button className={`block w-full px-4 py-2 text-sm text-left ${active ? 'bg-gray-700' : ''}`}>Edit</button>
+                          <button
+                            onClick={e => {
+                              e.stopPropagation();
+                              setModalJobId(job._id);  // Open applicants modal for this job
+                            }}
+                            className={`block w-full px-4 py-2 text-sm text-left ${active ? 'bg-gray-700' : ''}`}
+                          >
+                            Show Applicants
+                          </button>
                         )}
                       </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
-                          <button className={`block w-full px-4 py-2 text-sm text-left ${active ? 'bg-gray-700' : ''}`}>Delete</button>
+                          <button className={`block w-full px-4 py-2 text-sm text-left ${active ? 'bg-gray-700' : ''}`}>
+                            Edit
+                          </button>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button className={`block w-full px-4 py-2 text-sm text-left ${active ? 'bg-gray-700' : ''}`}>
+                            Delete
+                          </button>
                         )}
                       </Menu.Item>
                     </Menu.Items>
@@ -166,6 +184,27 @@ const JobTable = ({ jobs, setJobs, selectedJobId, setSelectedJobId }) => {
           ))}
         </tbody>
       </table>
+
+      {/* Modal for JobApplicants */}
+      {modalJobId && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+          onClick={() => setModalJobId(null)}
+        >
+          <div
+            className="bg-[#1c1f23] rounded-lg max-w-lg w-full p-6 text-white"
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setModalJobId(null)}
+              className="mb-4 px-3 py-1 bg-blue-600 rounded hover:bg-blue-700"
+            >
+              ← Close
+            </button>
+            <JobApplicants jobId={modalJobId} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
