@@ -88,6 +88,7 @@ export default function JobListingPage() {
                     <Link to="/user_home" className="text-white hover:underline">My applications</Link>
                     <Link to="/alljobs" className="text-white hover:underline ml-4">Home</Link>
                     <LogoutButton />
+                    
                 </div>
             </nav>
 

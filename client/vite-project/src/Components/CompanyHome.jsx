@@ -10,6 +10,7 @@ import {
   FaClipboardList,
   FaUserFriends,
   FaBuilding,
+  FaBell,
 } from 'react-icons/fa';
 import { Line } from 'react-chartjs-2';
 import {
@@ -23,9 +24,11 @@ import {
   Legend,
   Filler
 } from 'chart.js';
-import JobTable from './JobTable'; // ✅ Import redesigned JobTable
-import CreateJobPage from './CreateJobPage'; // ✅ Add CreateJobPage for integrated access
+import JobTable from './JobTable';
+import CreateJobPage from './CreateJobPage';
 import LogoutButton from './LogoutButton';
+import Notifications from './Notafications';
+import { io } from 'socket.io-client';
 
 ChartJS.register(
   CategoryScale,
@@ -38,7 +41,16 @@ ChartJS.register(
   Filler
 );
 
+const socket = io("http://localhost:8000", { withCredentials: true });
+
 export const CompanyHome = () => {
+  const [notifications, setNotifications] = useState(() => {
+    const saved = localStorage.getItem("companyNotifications");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [hasUnread, setHasUnread] = useState(notifications.length > 0);
+
   const [company, setCompany] = useState(null);
   const [jobs, setJobs] = useState([]);
   const [selectedJobId, setSelectedJobId] = useState(null);
@@ -71,8 +83,35 @@ export const CompanyHome = () => {
     axios.get(`http://localhost:8000/api/applications/company/${companyId}`)
       .then(res => setApplications(res.data))
       .catch(() => setError("❌ Failed to load applications."));
+  }, [companyId, location.state, navigate]);
+
+  // Socket - تسجيل الشركة للوصل للإشعارات
+  useEffect(() => {
+    if (companyId) {
+      socket.emit("registerCompany", companyId);
+    }
+
+    socket.on("newApplication", (data) => {
+      setNotifications(prev => {
+        const updated = [data, ...prev];
+        localStorage.setItem("companyNotifications", JSON.stringify(updated));
+        setHasUnread(true);
+        return updated;
+      });
+    });
+
+    return () => {
+      socket.off("newApplication");
+    };
   }, [companyId]);
 
+  // لما يضغط المستخدم على تبويب الإشعارات => اعتبرها مقروءة
+  const handleNotificationTabClick = () => {
+    setActiveTab("notification");
+    setHasUnread(false);
+  };
+
+  // بيانات لمثال الرسم البياني
   const totalApplications = applications.length;
   const totalJobs = jobs.length;
   const activeJobs = jobs.filter(job => job.status === 'active').length;
@@ -125,8 +164,17 @@ export const CompanyHome = () => {
         <SidebarButton icon={<FaClipboardList />} label="Jobs" setActiveTab={setActiveTab} activeTab={activeTab} tabName="jobs" />
         <SidebarButton icon={<FaUserFriends />} label="Applications" setActiveTab={setActiveTab} activeTab={activeTab} tabName="applications" />
         <SidebarButton icon={<FaBuilding />} label="Company Profile" setActiveTab={setActiveTab} activeTab={activeTab} tabName="profile" />
+        <button
+          onClick={handleNotificationTabClick}
+          className={`flex items-center gap-2 w-full px-4 py-2 rounded transition-all text-left ${activeTab === "notification" ? 'bg-[#1c1f23] font-semibold' : 'hover:bg-[#1c1f23]'}`}
+        >
+          <FaBell />
+          notification
+          {hasUnread && (
+            <span className="ml-auto w-3 h-3 bg-red-600 rounded-full animate-pulse"></span>
+          )}
+        </button>
         <LogoutButton />
-
       </aside>
 
       {/* Main Content */}
@@ -203,6 +251,10 @@ export const CompanyHome = () => {
             </div>
           </section>
         )}
+
+        {activeTab === 'notification' && companyId && (
+          <Notifications companyId={companyId} />
+        )}
       </main>
     </div>
   );
@@ -211,8 +263,7 @@ export const CompanyHome = () => {
 const SidebarButton = ({ icon, label, setActiveTab, activeTab, tabName }) => (
   <button
     onClick={() => setActiveTab(tabName)}
-    className={`flex items-center gap-2 w-full px-4 py-2 rounded transition-all text-left ${activeTab === tabName ? 'bg-[#1c1f23] font-semibold' : 'hover:bg-[#1c1f23]'
-      }`}
+    className={`flex items-center gap-2 w-full px-4 py-2 rounded transition-all text-left ${activeTab === tabName ? 'bg-[#1c1f23] font-semibold' : 'hover:bg-[#1c1f23]'}`}
   >
     {icon} {label}
   </button>
