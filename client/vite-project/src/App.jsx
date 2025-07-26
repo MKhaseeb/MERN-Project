@@ -14,6 +14,7 @@ import { CompanyHome } from './Components/CompanyHome';
 import  UserHomePage  from './Components/UserHomePage';
 import AllJobLists from './Components/AllJobLists';
 import ChartsComp from './Components/ChartsComp';
+import { DataqueueWidget } from './Components/DataqueueWidget';
 import CreateJobPage from './Components/CreateJobPage';
 import ApplyComponent from './Components/ApplyComponent';
 import { ApplicationBoard } from './Components/ApplicationBoard';
@@ -37,6 +38,8 @@ const [userId, setUserId] = useState(storedUserId);
       <Route path="/user_home" element={<UserHomePage userId={userId}/>} />
       <Route path="/allJobs" element={<AllJobLists/>} />
       <Route path="/Charts" element={<ChartsComp/>} />
+      <Route path="/queue" element={<DataqueueWidget/>} />
+
       <Route path="/apply/:id" element={<ApplyComponent/>} />
       <Route path="/board" element={<ApplicationBoard userId={userId} />} />
     </Routes>

@@ -1,11 +1,19 @@
 const Job = require('../models/JobListing.model');
+const Application = require('../models/Application'); // Add this import
+const User = require('../models/user.model'); // Add this import
 
 module.exports = {
     // Get all jobs
     getAllJobs: (req, res) => {
         Job.find()
             .populate('company')
-            .populate('applications.user')
+            .populate({
+                path: 'applications',
+                populate: {
+                    path: 'user',
+                    select: 'firstName lastName email'
+                }
+            })
             .then(jobs => res.json(jobs))
             .catch(err => res.status(500).json({ message: 'Failed to fetch jobs', error: err }));
     },
@@ -14,7 +22,13 @@ module.exports = {
     getJobById: (req, res) => {
         Job.findById(req.params.id)
             .populate('company')
-            .populate('applications.user')
+            .populate({
+                path: 'applications',
+                populate: {
+                    path: 'user',
+                    select: 'firstName lastName email'
+                }
+            })
             .then(job => {
                 if (!job) return res.status(404).json({ message: 'Job not found' });
                 res.json(job);
@@ -61,22 +75,19 @@ module.exports = {
         try {
             const userId = req.params.userId;
 
-            const jobs = await Job.find({ "applications.user": userId })
-                .populate("company", "companyName")
-                .select("title company applications")
-                .lean();
+            // Query applications directly instead of through jobs
+            const applications = await Application.find({ user: userId })
+                .populate('job', 'title')
+                .populate('company', 'companyName');
 
-            const userJobs = jobs.map(job => {
-                const userApplication = job.applications.find(app => app.user.toString() === userId);
-                return {
-                    jobId: job._id,
-                    title: job.title,
-                    company: job.company?.companyName || "Unknown",
-                    appliedAt: userApplication?.appliedAt,
-                };
-            });
+            const userApplications = applications.map(app => ({
+                jobId: app.job?._id,
+                title: app.job?.title,
+                company: app.company?.companyName || "Unknown",
+                appliedAt: app.appliedAt
+            }));
 
-            res.json(userJobs);
+            res.json(userApplications);
         } catch (err) {
             console.error("Error fetching user applications:", err);
             res.status(500).json({ message: "Failed to fetch applications." });
@@ -89,42 +100,57 @@ module.exports = {
 
         try {
             const { jobId } = req.params;
-            console.log("📌 req.user:", req.user);
-            const userId = req.user.id; // From auth middleware
-            // In JobController.applyToJob
-            const coverLetter = req.body.coverLetter; // Now correctly populated            console.log('Uploaded file:', req.file);
-
-            const cvFile = req.file; // Uploaded CV file
+            const userId = req.user.id;
+            const { coverLetter } = req.body;
+            const cvFile = req.file;
 
             if (!cvFile) {
                 return res.status(400).json({ message: 'CV file is required' });
             }
 
+            // Find the job to get company reference
             const job = await Job.findById(jobId);
             if (!job) return res.status(404).json({ message: 'Job not found' });
 
-            // Check if already applied
-            const alreadyApplied = job.applications.some(
-                app => app.user.toString() === userId
-            );
-            if (alreadyApplied) {
-                return res.status(400).json({ message: 'Already applied' });
+            // Check if user already applied
+            const existingApplication = await Application.findOne({
+                job: jobId,
+                user: userId
+            });
+
+            if (existingApplication) {
+                return res.status(400).json({ message: 'Already applied to this job' });
             }
 
-            // Add application with file metadata
-            job.applications.push({
+            // Create new application
+            const newApplication = new Application({
                 user: userId,
-                appliedAt: new Date(),
+                company: job.company, // Use company from job
+                job: jobId,
                 coverLetter,
-                cvPath: cvFile.path, // Store file path
+                cvPath: cvFile.path,
                 cvOriginalName: cvFile.originalname
             });
 
-            await job.save();
-            res.status(200).json({ message: 'Application submitted' });
+            const savedApplication = await newApplication.save();
+
+            // Add application to job's applications array
+            await Job.findByIdAndUpdate(jobId, {
+                $push: { applications: savedApplication._id }
+            });
+
+            // Add application to user's applications array
+            await User.findByIdAndUpdate(userId, {
+                $push: { applications: savedApplication._id }
+            });
+
+            res.status(201).json({
+                message: 'Application submitted successfully',
+                applicationId: savedApplication._id
+            });
         } catch (err) {
             console.error('Error applying to job:', err);
-            res.status(500).json({ message: 'Server error', error: err });
+            res.status(500).json({ message: 'Server error', error: err.message });
         }
     }
 };

@@ -20,7 +20,8 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 } from 'chart.js';
 import JobTable from './JobTable'; // ✅ Import redesigned JobTable
 import CreateJobPage from './CreateJobPage'; // ✅ Add CreateJobPage for integrated access
@@ -32,7 +33,8 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 export const CompanyHome = () => {

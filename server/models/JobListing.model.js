@@ -26,15 +26,10 @@ const JobSchema = new mongoose.Schema({
         ref: 'Company',
         required: true
     },
-    applications: [
-        {
-            user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-            appliedAt: { type: Date, default: Date.now },
-            coverLetter: String, // Store cover letter
-            cvPath: String,     // Path to uploaded CV
-            cvOriginalName: String
-        }
-    ]
+    applications: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Application'
+    }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Job', JobSchema);

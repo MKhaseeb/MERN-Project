@@ -107,6 +107,8 @@ export default function ApplyComponent() {
         } catch (error) {
             console.error("Application error:", error);
             alert("Failed to submit application.");
+
+
         }
     };
 
