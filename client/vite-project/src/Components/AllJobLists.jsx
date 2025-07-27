@@ -1,11 +1,10 @@
-// Clean version of JobListingPage with smooth scrolling only
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { FaSearch, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
 import Hero from "../assets/Hero2.png";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ApplyModal from "./ApplyModal";
-import LogoutButton from "./LogoutButton";
+import NavBar from "./NavBar";
 
 const FILTER_OPTIONS = {
     Pay: ["100000", "115000", "130000", "150000", "170000"],
@@ -19,7 +18,7 @@ const FILTER_OPTIONS = {
     Education: ["Bachelor's", "Master's", "PhD", "No degree"],
 };
 
-export default function JobListingPage() {
+export default function AllJobLists() {
     const [jobs, setJobs] = useState([]);
     const [error, setError] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
@@ -46,9 +45,7 @@ export default function JobListingPage() {
         setDropdownStates((prev) => ({ ...prev, [key]: false }));
     };
 
-
     useEffect(() => {
-
         axios.get("http://localhost:8000/api/jobs", { withCredentials: true })
             .then((res) => setJobs(res.data))
             .catch((err) => {
@@ -82,15 +79,7 @@ export default function JobListingPage() {
 
     return (
         <div className="min-h-screen bg-[#0f1214] text-white">
-            <nav className="bg-[#0f1214] border-b border-gray-800 px-6 py-4 shadow-sm flex justify-between items-center">
-                <h1 className="text-2xl font-bold tracking-wide text-white">Job Plus</h1>
-                <div>
-                    <Link to="/user_home" className="text-white hover:underline">My applications</Link>
-                    <Link to="/alljobs" className="text-white hover:underline ml-4">Home</Link>
-                    <LogoutButton />
-                    
-                </div>
-            </nav>
+            <NavBar />
 
             <section className="relative bg-[#0f1214] py-20 px-6 border-b border-gray-800 overflow-hidden">
                 <div className="max-w-6xl mx-auto flex flex-col-reverse md:flex-row items-center gap-12">
@@ -231,30 +220,12 @@ export default function JobListingPage() {
                                 )}
                             </div>
                             <div className="pt-4 border-t border-gray-700">
-                                <div className="pt-4 border-t border-gray-700">
-                                    <button
-                                        onClick={handleApplyClick}
-                                        className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold w-full"
-                                    >
-                                        Apply Now
-                                    </button>
-
-                                    {/* 
-    بديل باستخدام <Link>:
-    <Link to={{ pathname: `/apply/${selectedJob._id}`, state: { job: selectedJob } }}>
-        <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded mt-4">
-            Apply Now
-        </button>
-    </Link> 
-    */}
-                                </div>
-
-                                {/* <button
-                                    onClick={() => setShowApplyModal(true)}
+                                <button
+                                    onClick={handleApplyClick}
                                     className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold w-full"
                                 >
                                     Apply Now
-                                </button> */}
+                                </button>
                             </div>
                         </div>
                     ) : (
