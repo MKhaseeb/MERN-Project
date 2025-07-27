@@ -38,21 +38,20 @@ const JobTable = ({ jobs, setJobs, selectedJobId, setSelectedJobId }) => {
       console.error('Failed to update job statuses:', err);
     }
   };
-
+  const handleDeleteJob = async (jobId) => {
+    try {
+      await axios.delete(`http://localhost:8000/api/jobs/${jobId}`);
+      const updatedJobs = jobs.filter(job => job._id !== jobId);
+      setJobs(updatedJobs);
+    } catch (err) {
+      console.error('Failed to delete job:', err);
+    }
+  };
   return (
     <div className="bg-[#161a1d] p-6 rounded-xl border border-gray-700 shadow text-white">
       <div className="flex justify-between items-center mb-4">
         <div className="flex gap-2">
-          {['all', 'active', 'paused', 'closed'].map(status => (
-            <button
-              key={status}
-              onClick={() => setFilterStatus(status)}
-              className={`px-3 py-1 rounded capitalize ${filterStatus === status ? 'bg-blue-600' : 'bg-gray-800 hover:bg-gray-700'
-                }`}
-            >
-              {status}
-            </button>
-          ))}
+
         </div>
 
         {selectedJobs.length > 0 && (
@@ -80,20 +79,10 @@ const JobTable = ({ jobs, setJobs, selectedJobId, setSelectedJobId }) => {
       <table className="w-full text-left">
         <thead className="bg-[#1c1f23] text-gray-300">
           <tr>
-            <th className="p-2">
-              <input
-                type="checkbox"
-                onChange={(e) => {
-                  const allIds = filteredJobs.map(j => j._id);
-                  setSelectedJobs(e.target.checked ? allIds : []);
-                }}
-                checked={filteredJobs.length > 0 && filteredJobs.every(j => selectedJobs.includes(j._id))}
-              />
-            </th>
             <th className="p-2">Title</th>
             <th className="p-2">Location</th>
             <th className="p-2">Salary</th>
-            <th className="p-2">Status</th>
+            <th className="p-2">Applicants</th> {/* New column */}
             <th className="p-2">Actions</th>
           </tr>
         </thead>
@@ -104,22 +93,20 @@ const JobTable = ({ jobs, setJobs, selectedJobId, setSelectedJobId }) => {
                 className="border-t border-gray-700 text-gray-300 cursor-pointer hover:bg-[#1c1f23] transition"
                 onClick={() => setSelectedJobId(selectedJobId === job._id ? null : job._id)}
               >
-                <td className="p-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedJobs.includes(job._id)}
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={() => handleCheckboxChange(job._id)}
-                  />
-                </td>
+
                 <td className="p-2 font-semibold text-white">{job.title}</td>
                 <td className="p-2">{job.location}</td>
                 <td className="p-2">{job.salaryRange}</td>
-                <td className="p-2 capitalize">
-                  <span className={`px-2 py-1 rounded-full text-sm font-medium ${job.status === 'active' ? 'bg-green-600' : job.status === 'paused' ? 'bg-yellow-500' : 'bg-red-500'
-                    }`}>
-                    {job.status}
-                  </span>
+                <td className="p-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setModalJobId(job._id);
+                    }}
+                    className="px-3 py-1 text-sm bg-[#128a64] hover:bg-[#0E5640] rounded"
+                  >
+                    Show Applicants
+                  </button>
                 </td>
                 <td className="p-2">
                   <Menu as="div" className="relative inline-block text-left">
@@ -127,29 +114,14 @@ const JobTable = ({ jobs, setJobs, selectedJobId, setSelectedJobId }) => {
                       <FaEllipsisV />
                     </Menu.Button>
                     <Menu.Items className="absolute right-0 mt-1 w-40 bg-[#1c1f23] border border-gray-700 rounded shadow-md z-20">
+
                       <Menu.Item>
                         {({ active }) => (
                           <button
-                            onClick={e => {
+                            onClick={(e) => {
                               e.stopPropagation();
-                              setModalJobId(job._id);  // Open applicants modal for this job
-                            }}
-                            className={`block w-full px-4 py-2 text-sm text-left ${active ? 'bg-gray-700' : ''}`}
-                          >
-                            Show Applicants
-                          </button>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <button className={`block w-full px-4 py-2 text-sm text-left ${active ? 'bg-gray-700' : ''}`}>
-                            Edit
-                          </button>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <button className={`block w-full px-4 py-2 text-sm text-left ${active ? 'bg-gray-700' : ''}`}>
+                              handleDeleteJob(job._id);
+                            }} className={`block w-full px-4 py-2 text-sm text-left ${active ? 'bg-gray-700' : ''}`}>
                             Delete
                           </button>
                         )}

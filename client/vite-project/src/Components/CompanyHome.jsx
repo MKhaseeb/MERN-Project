@@ -19,6 +19,7 @@ import {
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
@@ -35,6 +36,7 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
@@ -117,43 +119,136 @@ export const CompanyHome = () => {
   const activeJobs = jobs.filter(job => job.status === 'active').length;
   const totalHired = applications.filter(app => app.status === 'Hired').length;
 
+  // Professional chart data
   const chartData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
     datasets: [
       {
+        type: 'bar',
         label: 'Applications',
-        data: [12, 19, 3, 5, 2, 10],
-        borderColor: '#3b82f6',
-        backgroundColor: '#3b82f655',
-        fill: true,
-        tension: 0.3,
+        data: [2, 5, 3, 6, 4, 8, 5],
+        backgroundColor: 'rgba(16, 185, 129, 0.7)',
+        borderColor: 'rgba(16, 185, 129, 1)',
+        borderWidth: 0,
+        borderRadius: 4,
+        yAxisID: 'y1',
       }
     ]
   };
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
     plugins: {
       legend: {
-        labels: { color: 'white' }
+        position: 'top',
+        labels: {
+          color: '#e2e8f0',
+          font: {
+            size: 12,
+            weight: '500'
+          },
+          usePointStyle: true,
+          pointStyle: 'circle',
+          padding: 20
+        }
       },
-      title: {
-        display: true,
-        text: 'Monthly Applications',
-        color: 'white'
+      tooltip: {
+        backgroundColor: '#1e293b',
+        titleColor: '#e2e8f0',
+        bodyColor: '#cbd5e1',
+        borderColor: '#334155',
+        borderWidth: 1,
+        padding: 12,
+        cornerRadius: 8,
+        displayColors: true,
+        usePointStyle: true,
+        callbacks: {
+          label: function (context) {
+            let label = context.dataset.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.parsed.y !== null) {
+              label += context.parsed.y;
+            }
+            return label;
+          }
+        }
       }
     },
     scales: {
       x: {
-        ticks: { color: 'white' },
-        grid: { color: '#2c343c' }
+        grid: {
+          display: false,
+          drawBorder: false
+        },
+        ticks: {
+          color: '#94a3b8',
+          font: {
+            size: 11
+          }
+        }
       },
       y: {
-        ticks: { color: 'white' },
-        grid: { color: '#2c343c' }
+        type: 'linear',
+        display: true,
+        position: 'left',
+        title: {
+          display: true,
+          text: 'Applications',
+          color: '#94a3b8',
+          font: {
+            size: 12
+          }
+        },
+        grid: {
+          color: 'rgba(148, 163, 184, 0.1)',
+          drawBorder: false
+        },
+        ticks: {
+          color: '#94a3b8',
+          padding: 8,
+          font: {
+            size: 11
+          }
+        }
+      },
+      y1: {
+        type: 'linear',
+        display: true,
+        position: 'right',
+        title: {
+          display: true,
+          text: 'Hires',
+          color: '#94a3b8',
+          font: {
+            size: 12
+          }
+        },
+        grid: {
+          display: false,
+          drawBorder: false
+        },
+        ticks: {
+          color: '#94a3b8',
+          padding: 8,
+          font: {
+            size: 11
+          }
+        }
       }
+    },
+    animation: {
+      duration: 1000,
+      easing: 'easeOutQuart'
     }
   };
+
 
   return (
     <div className="min-h-screen flex bg-[#0f1214] text-white">
@@ -162,8 +257,8 @@ export const CompanyHome = () => {
         <h2 className="text-xl font-bold mb-6">🏢 {company?.companyName}</h2>
         <SidebarButton icon={<FaHome />} label="Overview" setActiveTab={setActiveTab} activeTab={activeTab} tabName="overview" />
         <SidebarButton icon={<FaClipboardList />} label="Jobs" setActiveTab={setActiveTab} activeTab={activeTab} tabName="jobs" />
-        <SidebarButton icon={<FaUserFriends />} label="Applications" setActiveTab={setActiveTab} activeTab={activeTab} tabName="applications" />
         <SidebarButton icon={<FaBuilding />} label="Company Profile" setActiveTab={setActiveTab} activeTab={activeTab} tabName="profile" />
+
         <button
           onClick={handleNotificationTabClick}
           className={`flex items-center gap-2 w-full px-4 py-2 rounded transition-all text-left ${activeTab === "notification" ? 'bg-[#1c1f23] font-semibold' : 'hover:bg-[#1c1f23]'}`}
@@ -182,14 +277,14 @@ export const CompanyHome = () => {
         {activeTab === 'overview' && (
           <>
             <h2 className="text-3xl font-bold mb-6 text-white">Dashboard</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 mb-10">
               <Card icon={<FaBriefcase />} title="Total Jobs" value={totalJobs} color="blue-400" />
               <Card icon={<FaUsers />} title="Applications" value={totalApplications} color="green-400" />
-              <Card icon={<FaClock />} title="Active Jobs" value={activeJobs} color="yellow-400" />
-              <Card icon={<FaCheck />} title="Hires" value={totalHired} color="purple-400" />
             </div>
-            <div className="bg-[#161a1d] p-6 rounded-xl border border-gray-700 shadow">
-              <Line data={chartData} options={chartOptions} />
+            <div className="bg-[#161a1d] p-6 rounded-xl border border-gray-700 shadow-lg mb-10">
+              <div className="h-80">
+                <Line data={chartData} options={chartOptions} />
+              </div>
             </div>
           </>
         )}
@@ -200,7 +295,7 @@ export const CompanyHome = () => {
               <h3 className="text-xl font-semibold text-white">Job Listings</h3>
               <button
                 onClick={() => setShowCreateJob(true)}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded shadow"
+                className="px-4 py-2  bg-[#128a64] hover:bg-[#0E5640] text-white rounded-lg shadow-md transition-all duration-300"
               >
                 + Create Listing
               </button>
@@ -213,41 +308,37 @@ export const CompanyHome = () => {
           </section>
         )}
 
-        {activeTab === 'applications' && (
-          <section>
-            <h3 className="text-xl font-semibold mb-4 text-white">Recent Applications</h3>
-            <table className="min-w-full bg-[#161a1d] rounded shadow overflow-hidden border border-gray-700">
-              <thead className="bg-[#1c1f23] text-gray-300">
-                <tr>
-                  <th className="px-4 py-2 text-left text-sm">Applicant</th>
-                  <th className="px-4 py-2 text-left text-sm">Job Title</th>
-                  <th className="px-4 py-2 text-left text-sm">Status</th>
-                  <th className="px-4 py-2 text-left text-sm">Applied At</th>
-                </tr>
-              </thead>
-              <tbody>
-                {applications.slice(0, 5).map(app => (
-                  <tr key={app._id} className="border-t border-gray-700 text-gray-400">
-                    <td className="px-4 py-2 text-sm">{app.user?.name || 'N/A'}</td>
-                    <td className="px-4 py-2 text-sm">{app.job?.title || 'N/A'}</td>
-                    <td className="px-4 py-2 text-sm">{app.status}</td>
-                    <td className="px-4 py-2 text-sm">{new Date(app.appliedAt).toLocaleDateString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-        )}
 
         {activeTab === 'profile' && (
           <section>
             <h3 className="text-xl font-semibold mb-4 text-white">Company Profile</h3>
-            <div className="bg-[#161a1d] p-6 rounded border border-gray-700 shadow space-y-3 text-gray-300">
-              <p><strong className="text-white">Company Name:</strong> {company.companyName}</p>
-              <p><strong className="text-white">Email:</strong> {company.email}</p>
-              <p><strong className="text-white">Location:</strong> {company.location || 'N/A'}</p>
-              <p><strong className="text-white">Website:</strong> <a href={company.website} className="text-blue-400 underline">{company.website}</a></p>
-              <p><strong className="text-white">Description:</strong> {company.description || 'No description yet.'}</p>
+            <div className="bg-[#161a1d] p-6 rounded-xl border border-gray-700 shadow space-y-4 text-gray-300">
+              <div className="flex items-start">
+                <div className="w-1/4 text-gray-400">Company Name:</div>
+                <div className="w-3/4 text-white">{company?.companyName}</div>
+              </div>
+              <div className="flex items-start">
+                <div className="w-1/4 text-gray-400">Email:</div>
+                <div className="w-3/4 text-white">{company?.email}</div>
+              </div>
+              <div className="flex items-start">
+                <div className="w-1/4 text-gray-400">Location:</div>
+                <div className="w-3/4 text-white">{company?.location || 'N/A'}</div>
+              </div>
+              <div className="flex items-start">
+                <div className="w-1/4 text-gray-400">Website:</div>
+                <div className="w-3/4">
+                  <a href={company?.website} className="text-blue-400 hover:text-blue-300 underline">
+                    {company?.website}
+                  </a>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <div className="w-1/4 text-gray-400">Description:</div>
+                <div className="w-3/4 text-white">
+                  {company?.description || 'No description yet.'}
+                </div>
+              </div>
             </div>
           </section>
         )}
@@ -270,9 +361,9 @@ const SidebarButton = ({ icon, label, setActiveTab, activeTab, tabName }) => (
 );
 
 const Card = ({ icon, title, value, color }) => (
-  <div className="bg-[#161a1d] border border-gray-700 p-4 rounded-xl text-center shadow hover:shadow-blue-500/20 transition-all">
-    <div className={`mx-auto text-${color} text-2xl`}>{icon}</div>
-    <p className="mt-2 text-xl font-bold text-white">{value}</p>
-    <p className="text-sm text-gray-400">{title}</p>
+  <div className={`bg-gradient-to-br from-[#1c1f23] to-[#161a1d] border border-gray-800 p-5 rounded-xl shadow-lg hover:shadow-indigo-500/20 transition-all duration-300`}>
+    <div className={`text-${color} text-3xl mb-3`}>{icon}</div>
+    <p className="text-2xl font-bold text-white mb-1">{value}</p>
+    <p className="text-sm text-gray-400 font-medium">{title}</p>
   </div>
 );
