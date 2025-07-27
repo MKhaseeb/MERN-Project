@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 const JobInsightsWriter = ({ allJobs }) => {
     const [article, setArticle] = useState('');
     const [loading, setLoading] = useState(false);
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
 
 
     useEffect(() => {
@@ -16,7 +15,7 @@ const JobInsightsWriter = ({ allJobs }) => {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`,
+                        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
                     },
                     body: JSON.stringify({
                         model: "gpt-4",
