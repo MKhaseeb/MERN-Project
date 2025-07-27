@@ -10,8 +10,11 @@ const JobTable = ({ jobs, setJobs, selectedJobId, setSelectedJobId }) => {
 
   // New state to track which job's applicants modal is open
   const [modalJobId, setModalJobId] = useState(null);
+  const companyId = localStorage.getItem("companyId");
+  const companyJobs = (jobs || []).filter(job => job.company === companyId);
 
-  const filteredJobs = jobs.filter(job => {
+
+const filteredJobs = companyJobs.filter(job => {
     if (filterStatus === 'all') return true;
     return job.status?.toLowerCase() === filterStatus;
   });

@@ -322,20 +322,20 @@ export const CompanyHome = () => {
               </div>
               <div className="flex items-start">
                 <div className="w-1/4 text-gray-400">Location:</div>
-                <div className="w-3/4 text-white">{company?.location || 'N/A'}</div>
+                <div className="w-3/4 text-white">{company?.address.country + "," + company?.address.city + ", " + company?.address.street  || 'N/A'}</div>
               </div>
               <div className="flex items-start">
                 <div className="w-1/4 text-gray-400">Website:</div>
                 <div className="w-3/4">
                   <a href={company?.website} className="text-blue-400 hover:text-blue-300 underline">
-                    {company?.website}
+                    TechForFuture.com
                   </a>
                 </div>
               </div>
               <div className="flex items-start">
                 <div className="w-1/4 text-gray-400">Description:</div>
                 <div className="w-3/4 text-white">
-                  {company?.description || 'No description yet.'}
+                  {company?.details || 'No description yet.'}
                 </div>
               </div>
             </div>

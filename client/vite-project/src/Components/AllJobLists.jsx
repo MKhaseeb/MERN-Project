@@ -171,7 +171,7 @@ export default function AllJobLists() {
                         <div className="space-y-6">
                             <div>
                                 <h2 className="text-3xl font-bold text-white mb-1">{selectedJob.title}</h2>
-                                <p className="text-gray-400">{selectedJob.company?.name || "Company Name"}</p>
+                                <p className="text-gray-400">{selectedJob.company?.companyName || "Company Name"}</p>
                                 <div className="flex gap-4 mt-2 text-sm text-gray-500">
                                     <span><FaMapMarkerAlt className="inline mr-1 text-blue-400" />{selectedJob.location}</span>
                                     <span><FaCalendarAlt className="inline mr-1 text-purple-400" />{new Date(selectedJob.createdAt).toLocaleDateString()}</span>

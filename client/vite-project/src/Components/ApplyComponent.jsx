@@ -100,7 +100,6 @@ export default function ApplyComponent() {
                 withCredentials: true,
             });
 
-            alert("✅ Application submitted successfully!");
             navigate("/user_home");
         } catch (error) {
             console.error("❌ Application error:", error.response?.data || error.message);

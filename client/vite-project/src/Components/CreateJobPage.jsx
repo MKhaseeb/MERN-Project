@@ -32,7 +32,7 @@ const CreateJobPage = () => {
     return (
         <div className="min-h-screen bg-[#0f1214] text-white px-6 py-10 flex items-center justify-center">
             <div className="bg-[#161a1d] p-8 rounded-xl shadow border border-gray-700 max-w-2xl w-full">
-                <h2 className="text-2xl font-bold mb-6 text-center">📄 Create a Job Listing</h2>
+                <h2 className="text-2xl font-bold mb-6 text-center"> Create a Job Listing</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input
                         type="text"
@@ -83,6 +83,10 @@ const CreateJobPage = () => {
                         ✅ Post Job
                     </button>
                 </form>
+                    <a href="/company_home"><button
+                        className="w-full px-6 py-3 border border-red-500 text-red-400 hover:text-white hover:bg-red-600 rounded-xl font-semibold transition-all shadow-sm hover:shadow-lg"
+                    >Cancel
+                    </button></a>
             </div>
         </div>
     );
