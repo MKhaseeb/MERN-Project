@@ -3,7 +3,7 @@
 // import viteLogo from '/vite.svg'
 // import viteL from '/palestine.svg'
 import './App.css'
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link ,useLocation} from "react-router-dom";
 import Homecomponent from './Components/Homecomponent'
 import RegisterUser from './Components/RegisterUser'
 import CompanyRegister from './Components/CompanyRegister';
@@ -21,16 +21,17 @@ import { ApplicationBoard } from './Components/ApplicationBoard';
 
 function App() {
   // const userId = localStorage.getItem("userId"); 
+    const location = useLocation();
   const [companyId, setCompanyId] = useState(null);
 const storedUserId = localStorage.getItem("userId");
 const [userId, setUserId] = useState(storedUserId);
 
 
   return (
-    <Routes>
+      <Routes location={location} key={location.pathname}>
       <Route path="/" element={<Homecomponent />} />
-      <Route path="/register" element={<RegisterUser setUserId={setUserId} />} />
       <Route path="/login" element={<LoginComponent setUserId={setUserId} />} />
+      <Route path="/register" element={<RegisterUser setUserId={setUserId} />} />
       <Route path="/register_company" element={<CompanyRegister setCompanyId={setCompanyId} />} />
       <Route path="/login_company" element={<CompanyLogin />} />
       <Route path="/company_home" element={<CompanyHome companyId={companyId} />} />

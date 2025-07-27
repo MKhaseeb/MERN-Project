@@ -107,7 +107,6 @@ export const CompanyHome = () => {
     };
   }, [companyId]);
 
-  // لما يضغط المستخدم على تبويب الإشعارات => اعتبرها مقروءة
   const handleNotificationTabClick = () => {
     setActiveTab("notification");
     setHasUnread(false);
