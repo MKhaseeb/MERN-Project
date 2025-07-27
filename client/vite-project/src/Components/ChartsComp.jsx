@@ -5,6 +5,7 @@ import {
     AreaChart, Area, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';
 import JobInsightsWriter from './JobInsightsWriter';
+import { toast } from 'react-hot-toast'; // Import toast for notifications
 
 const COLORS = [
     '#3b82f6', '#10b981', '#f59e0b', '#ef4444',
@@ -31,21 +32,43 @@ const colors = {
     border: "#374151"
 };
 
-const ChartsComp = ({ data = {} }) => {
-  const {
-    accumulatedCounts = {},
-    salaryByTitle = {},
-    locationCounts = {},
-    skillDemand = {},
-    contractTypes = {},
-    experienceLevels = {},
-    remoteJobs = { remote: 0, onsite: 0, hybrid: 0 },
-    topEmployers = [],
-    jobPostingTrends = [],
-    allTitles = []
-  } = data;
+const ChartsComp = ({ data = {}, fetchData }) => {
+    const {
+        accumulatedCounts = {},
+        salaryByTitle = {},
+        locationCounts = {},
+        skillDemand = {},
+        contractTypes = {},
+        experienceLevels = {},
+        remoteJobs = { remote: 0, onsite: 0, hybrid: 0 },
+        topEmployers = [],
+        jobPostingTrends = [],
+        allTitles = []
+    } = data;
 
     const [activeTab, setActiveTab] = React.useState('market');
+    const [isLoading, setIsLoading] = React.useState(false);
+
+    const handleFetchData = async () => {
+        if (!fetchData) {
+            console.log("fetchData not provided");
+
+            return;
+        }
+        console.log("fetchData function:", fetchData);
+
+        setIsLoading(true);
+        try {
+            console.log("Fetching...");
+            await fetchData();
+            alert("Market data refreshed successfully!");
+        } catch (error) {
+            alert("Failed to fetch market data.");
+            console.error('Fetch error:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const createBins = (data, binSize = 15000) => {
         if (!data || data.length === 0) return { labels: [], counts: [] };
@@ -170,6 +193,60 @@ const ChartsComp = ({ data = {} }) => {
             className="min-h-screen text-white relative overflow-hidden"
             style={{ backgroundColor: colors.bg }}
         >
+            {/* Data Refresh Button */}
+            <div className="fixed top-4 right-4 z-50">
+                <button
+                    onClick={handleFetchData}
+                    disabled={isLoading}
+                    className={`px-4 py-2 rounded-full font-bold flex items-center gap-2 transition-all duration-300 ${isLoading
+                        ? 'bg-gray-600 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg'
+                        }`}
+                >
+                    {isLoading ? (
+                        <>
+                            <svg
+                                className="animate-spin h-5 w-5 text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                ></circle>
+                                <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                            </svg>
+                            Loading...
+                        </>
+                    ) : (
+                        <>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    fillRule="evenodd"
+                                    d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+                                    clipRule="evenodd"
+                                />
+                            </svg>
+                            Refresh Data
+                        </>
+                    )}
+                </button>
+            </div>
+
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-5">
                 <div className="absolute inset-0" style={{
