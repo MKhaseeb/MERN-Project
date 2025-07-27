@@ -1,6 +1,8 @@
 const Company = require('../models/company.model');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const Application = require('../models/Application');
+const { default: mongoose } = require('mongoose');
 
 
 module.exports = {
@@ -70,9 +72,19 @@ module.exports.getCompany = (request, response) => {
 module.exports.getApplicationsByCompany = async (req, res) => {
     try {
         const { companyId } = req.params;
-        const applications = await Application.find({ companyId }); // تأكد من أن اسم الحقل صحيح
+
+        // تأكد إن الـ ID صالح (اختياري بس مفيد)
+        if (!mongoose.Types.ObjectId.isValid(companyId)) {
+            return res.status(400).json({ message: "Invalid company ID" });
+        }
+
+        const applications = await Application.find({ company: companyId })
+            .populate("user job"); // إذا بدك تفاصيل أكثر
+
         res.status(200).json(applications);
     } catch (error) {
-        res.status(500).json({ message: "Server error", error });
+        console.error("Error fetching applications:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+
