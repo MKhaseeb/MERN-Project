@@ -127,7 +127,7 @@ const JobDataProvider = () => {
             {loading ? (
                 <p>Loading...</p>
             ) : processedData ? (
-                <ChartsComp data={processedData} />
+                <ChartsComp data={processedData} fetchData={fetchJobs} />
             ) : (
                 <p>No data available.</p>
             )}
