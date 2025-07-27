@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaUser, FaSignOutAlt, FaBookmark, FaBriefcase, FaBell } from "react-icons/fa";
+import { FaUser, FaSignOutAlt, FaBookmark, FaBriefcase, FaBell, FaClipboardList, FaWarehouse } from "react-icons/fa";
 import ChartsComp from "./ChartsComp";
+import AllJobLists from "./AllJobLists";
+import { useNavigate } from "react-router-dom";
 
 const colors = {
     bg: "#0f1214",
@@ -11,21 +13,28 @@ const colors = {
     primary: "#3b82f6",
     chartFill: "#3b82f655",
 };
+const Sidebar = ({ active, onChange, onLogout }) => {
+    const navigate = useNavigate();
 
-const Sidebar = ({ active, onChange, onLogout }) => (
+    const handleClick = (key) => {
+        onChange(key);
+        if (key === "home") {
+            navigate("/allJobs");
+        }
+    };
+    return(
     <div className="h-screen w-64 bg-[#1c1f23] text-white p-6 flex flex-col justify-between fixed left-0 top-0">
         <div className="space-y-4">
             <h1 className="text-xl font-bold mb-6">Job Plus</h1>
             {[
+                { icon: <FaWarehouse />, label: "Home", key: "home" },
                 { icon: <FaUser />, label: "Profile", key: "profile" },
                 { icon: <FaBriefcase />, label: "Applications", key: "applications" },
-                { icon: <FaBookmark />, label: "Saved Jobs", key: "saved" },
-                { icon: <FaBell />, label: "Notifications", key: "notifications" },
                 { icon: <FaBriefcase />, label: "Insights", key: "charts" },
             ].map(({ icon, label, key }) => (
                 <button
                     key={key}
-                    onClick={() => onChange(key)}
+                    onClick={() => handleClick(key)}
                     className={`flex items-center gap-2 p-3 w-full rounded-xl transition duration-200 ${active === key ? "bg-[#161a1d]" : "hover:bg-[#2c343c]"
                         }`}
                 >
@@ -40,7 +49,8 @@ const Sidebar = ({ active, onChange, onLogout }) => (
             <FaSignOutAlt /> Logout
         </button>
     </div>
-);
+  );
+};
 
 const API_KEY = "b4232c55e1msh2fa179ace936293p15516djsn3b98c2ac71c2";
 const API_HOST = "jsearch.p.rapidapi.com";
@@ -194,7 +204,7 @@ const UserHomePage = () => {
             setLoading(false);
         }
     };
-    
+
     useEffect(() => {
         fetchJobs();
     }, []);
@@ -256,10 +266,8 @@ const UserHomePage = () => {
 
                 {page === "applications" && (
                     <>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 mb-10">
                             <StatCard title="Applications" value={statCounts.totalApplications} />
-                            <StatCard title="Interviews" value={statCounts.interviews} />
-                            <StatCard title="Saved Jobs" value={statCounts.saved} />
                             <StatCard title="Profile Completeness" value={statCounts.profileProgress} />
                         </div>
 
@@ -389,6 +397,7 @@ const UserHomePage = () => {
                         ) : (
                             <p className="text-red-500">Failed to load data.</p>
                         )}
+
                     </>
                 )}
             </main>

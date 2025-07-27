@@ -1,7 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
 import gsap from "gsap";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { FaUser, FaEye, FaEyeSlash } from 'react-icons/fa';
+
+const colors = {
+  bg: "#0f1214",
+  card: "#161a1d",
+  grid: "#2c343c",
+  sidebar: "#1c1f23",
+  primary: "#3b82f6",
+};
 
 export default function RegisterUser({ setUserId }) {
   const [formData, setFormData] = useState({
@@ -10,21 +19,13 @@ export default function RegisterUser({ setUserId }) {
     email: "",
     password: "",
     confirmPassword: "",
-  }); 
-const steps = ["Account", "Contact", "Professional", "Education", "Resume"];
-
-// const RegisterUser = () => {
-  const [step, setStep] = useState(0);
-//   const [formData, setFormData] = useState({
-//     firstName: "", lastName: "", email: "", password: "", confirmPassword: "",
-//     phone: "", location: "", linkedin: "", website: "",
-//     desiredTitle: "", experience: "", skills: "", preferredType: "", expectedSalary: "",
-//     degree: "", field: "", university: "", graduationYear: "",
-//     resumeUrl: "", bio: ""
-//   });
+  });
 
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const containerRef = useRef();
   const navigate = useNavigate();
 
@@ -32,207 +33,202 @@ const steps = ["Account", "Contact", "Professional", "Education", "Resume"];
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const validateStep = () => {
-    if (step === 0) {
-      const { firstName, lastName, email, password, confirmPassword } = formData;
-      if (!firstName || !lastName || !email || !password || password !== confirmPassword) {
-        alert("Please fill out all fields correctly on this step.");
-        return false;
-      }
+  const validate = () => {
+    const { firstName, lastName, email, password, confirmPassword } = formData;
+    const newErrors = {};
+
+    if (!firstName.trim()) newErrors.firstName = "First name is required";
+    if (!lastName.trim()) newErrors.lastName = "Last name is required";
+    if (!email.trim()) newErrors.email = "Email is required";
+    if (!password.trim()) newErrors.password = "Password is required";
+    if (password !== confirmPassword) newErrors.confirmPassword = "Passwords do not match";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return false;
     }
     return true;
   };
 
-  const next = () => {
-    if (step < steps.length - 1 && validateStep()) {
-      gsap.to(containerRef.current, {
-        xPercent: -100,
-        duration: 0.6,
-        ease: "power3.inOut",
-        onComplete: () => setStep((prev) => prev + 1),
-      });
-    }
-  };
-
-  const prev = () => {
-    if (step > 0) {
-      gsap.to(containerRef.current, {
-        xPercent: 100,
-        duration: 0.6,
-        ease: "power3.inOut",
-        onComplete: () => setStep((prev) => prev - 1),
-      });
-    }
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validate()) return;
 
-    axios
-      .post("http://localhost:8000/api/register", formData, { withCredentials: true })
-      .then((res) => {
-        const userId = res.data._id || res.data.user?._id;
+    setIsLoading(true);
 
-        if (setUserId && userId) {
-          setUserId(userId); // Store in context/state
-        }
+    try {
+      const res = await axios.post("http://localhost:8000/api/register", formData, { withCredentials: true });
+      const userId = res.data._id || res.data.user?._id;
 
-        localStorage.setItem("userId", userId); // Optional: also save to localStorage
-        setMessage("");
-        setErrors({});
-        navigate("/user_home", { state: { userId } }); // Optional: pass via route state
-      })
-      .catch((err) => {
-        const errData = err.response?.data;
-        if (errData?.errors) {
-          setErrors(errData.errors);
-        } else if (errData?.message) {
-          setMessage(errData.message);
-        } else {
-          setMessage("Something went wrong.");
-        }
-      });
+      if (setUserId && userId) setUserId(userId);
+      localStorage.setItem("userId", userId);
+      setMessage("");
+      setErrors({});
+      navigate("/user_home", { state: { userId } });
+    } catch (err) {
+      const errData = err.response?.data;
+      if (errData?.errors) {
+        setErrors(errData.errors);
+      } else if (errData?.message) {
+        setMessage(errData.message);
+      } else {
+        setMessage("Something went wrong.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    gsap.set(containerRef.current, { xPercent: 0 });
-    gsap.fromTo(
-      containerRef.current,
-      { xPercent: 100, opacity: 0 },
-      { xPercent: 0, opacity: 1, duration: 0.6, ease: "power3.out" }
-    );
-  }, [step]);
+    gsap.set(containerRef.current, { xPercent: 100, opacity: 0 });
+    gsap.to(containerRef.current, {
+      xPercent: 0,
+      opacity: 1,
+      duration: 0.6,
+      ease: "power3.out",
+    });
+  }, []);
 
   const Input = (label, name, type = "text", placeholder = "") => (
     <div className="w-full">
-      <label className="block text-sm font-semibold text-gray-700 mb-1">{label}</label>
-      <input
-        type={type}
-        name={name}
-        value={formData[name]}
-        placeholder={placeholder}
-        onChange={handleChange}
-        className="w-full bg-white text-gray-800 border border-gray-300 p-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
+      <label className="block text-gray-300 text-sm font-medium mb-2">{label}</label>
+      <div className="relative">
+        <input
+          type={
+            name === "password" ? (showPassword ? "text" : "password") :
+              name === "confirmPassword" ? (showConfirmPassword ? "text" : "password") :
+                type
+          }
+          name={name}
+          value={formData[name]}
+          placeholder={placeholder}
+          onChange={handleChange}
+          className="w-full p-4 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 text-white placeholder-gray-500"
+          style={{
+            backgroundColor: colors.sidebar,
+            borderColor: colors.grid,
+            paddingRight: (name === "password" || name === "confirmPassword") ? "3rem" : "1rem"
+          }}
+          disabled={isLoading}
+        />
+        {name === "password" && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        )}
+        {name === "confirmPassword" && (
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+          >
+            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        )}
+      </div>
+      {errors[name] && <p className="text-red-400 text-sm mt-2">{errors[name].message || errors[name]}</p>}
     </div>
   );
-
-  const TextArea = (label, name) => (
-    <div className="w-full">
-      <label className="block text-sm font-semibold text-gray-700 mb-1">{label}</label>
-      <textarea
-        name={name}
-        value={formData[name]}
-        onChange={handleChange}
-        className="w-full bg-white text-gray-800 border border-gray-300 p-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        rows={4}
-      />
-    </div>
-  );
-
-  const renderStep = () => {
-    switch (step) {
-      case 0:
-        return (
-          <>
-            {Input("First Name", "firstName", "text", "Sarah")}
-            {Input("Last Name", "lastName", "text", "Smith")}
-            {Input("Email", "email", "email", "sarah@example.com")}
-            {Input("Password", "password", "password")}
-            {Input("Confirm Password", "confirmPassword", "password")}
-          </>
-        );
-      case 1:
-        return (
-          <>
-            {Input("Phone", "phone", "text", "+970")}
-            {Input("Location", "location", "text", "Ramallah, Palestine")}
-            {Input("LinkedIn URL", "linkedin")}
-            {Input("Website", "website")}
-          </>
-        );
-      case 2:
-        return (
-          <>
-            {Input("Desired Job Title", "desiredTitle")}
-            {Input("Years of Experience", "experience")}
-            {Input("Skills", "skills", "text", "JavaScript, React, AI")}
-            {Input("Preferred Type", "preferredType", "text", "Remote, Full-Time")}
-            {Input("Expected Salary", "expectedSalary")}
-          </>
-        );
-      case 3:
-        return (
-          <>
-            {Input("Degree", "degree")}
-            {Input("Field", "field")}
-            {Input("University", "university")}
-            {Input("Graduation Year", "graduationYear")}
-          </>
-        );
-      case 4:
-        return (
-          <>
-            {Input("Resume URL", "resumeUrl")}
-            {TextArea("Tell us about yourself", "bio")}
-          </>
-        );
-      default:
-        return null;
-    }
-  };
 
   return (
-    <section className="min-h-screen flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <h1 className="text-center text-xl font-semibold text-gray-800">
-            Step {step + 1} of {steps.length} — {steps[step]}
-          </h1>
-
-          <div
-            key={step}
-            ref={containerRef}
-            className="transition-transform ease-in-out duration-700 space-y-5"
-          >
-            {renderStep()}
+    <>
+      <nav className="sticky top-0 bg-gray-900 text-white px-6 py-4 flex justify-between items-center shadow-md z-50">
+        <div className="text-xl font-bold"><a href="/" className="hover:text-indigo-400">Jop Plus</a></div>
+      </nav>
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: colors.bg }}>
+        <div className="w-full max-w-md">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style={{ backgroundColor: colors.primary }}>
+              <FaUser className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
+            <p className="text-gray-400">Join us today and start your journey</p>
           </div>
 
-          <div className="flex justify-between items-center pt-4">
-            {step > 0 ? (
-              <button
-                type="button"
-                onClick={prev}
-                className="text-sm text-gray-600 hover:text-blue-600"
-              >
-                Back
-              </button>
-            ) : (
-              <span />
+          {/* Main Form Card */}
+          <div className="p-8 rounded-2xl shadow-2xl border" style={{ backgroundColor: colors.card, borderColor: colors.grid }}>
+            {message && (
+              <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+                <p className="text-red-400 text-center text-sm">{message}</p>
+              </div>
             )}
 
-            {step < steps.length - 1 ? (
-              <button
-                type="button"
-                onClick={next}
-                className="bg-[#0a66c2] hover:bg-[#004182] text-white font-bold text-sm px-6 py-2 rounded-full"
-              >
-                Next
-              </button>
-            ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div ref={containerRef} className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {Input("First Name", "firstName", "text", "Sarah")}
+                  {Input("Last Name", "lastName", "text", "Smith")}
+                </div>
+
+                {Input("Email Address", "email", "email", "sarah@example.com")}
+                {Input("Password", "password", "password", "Create a strong password")}
+                {Input("Confirm Password", "confirmPassword", "password", "Confirm your password")}
+              </div>
+
               <button
                 type="submit"
-                className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-6 py-2 rounded-full"
+                disabled={isLoading}
+                className="w-full py-4 rounded-xl font-semibold text-white transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: colors.primary }}
               >
-                Submit
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Creating Account...
+                  </div>
+                ) : (
+                  'Create Account'
+                )}
               </button>
-            )}
+            </form>
+
+            {/* Navigation Links */}
+            <div className="mt-8 space-y-4">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t" style={{ borderColor: colors.grid }}></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 text-gray-400" style={{ backgroundColor: colors.card }}>Already have an account?</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Link
+                  to="/login"
+                  className="flex items-center justify-center px-4 py-3 rounded-xl border text-sm font-medium transition-all duration-200 hover:scale-[1.02] text-gray-300 hover:text-white"
+                  style={{ borderColor: colors.grid, backgroundColor: colors.sidebar }}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/register_company"
+                  className="flex items-center justify-center px-4 py-3 rounded-xl border text-sm font-medium transition-all duration-200 hover:scale-[1.02] text-gray-300 hover:text-white"
+                  style={{ borderColor: colors.grid, backgroundColor: colors.sidebar }}
+                >
+                  Company Register
+                </Link>
+              </div>
+
+              <div className="text-center">
+                <Link
+                  to="/login_company"
+                  className="text-sm hover:underline transition-colors duration-200"
+                  style={{ color: colors.primary }}
+                >
+                  Have a company account? Sign in
+                </Link>
+              </div>
+            </div>
           </div>
-
-          {message && <p className="text-red-500 text-sm text-center">{message}</p>}
-        </form>
+        </div>
       </div>
-    </section>
-  );
-};
+    </>
 
+  );
+}
