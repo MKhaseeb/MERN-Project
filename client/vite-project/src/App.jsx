@@ -14,7 +14,7 @@ import { CompanyHome } from './Components/CompanyHome';
 import  UserHomePage  from './Components/UserHomePage';
 import AllJobLists from './Components/AllJobLists';
 import ChartsComp from './Components/ChartsComp';
-import { DataqueueWidget } from './Components/DataqueueWidget';
+import DataqueueWidget from './Components/DataqueueWidget';
 import CreateJobPage from './Components/CreateJobPage';
 import ApplyComponent from './Components/ApplyComponent';
 import { ApplicationBoard } from './Components/ApplicationBoard';

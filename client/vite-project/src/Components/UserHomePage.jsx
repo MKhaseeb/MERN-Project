@@ -5,6 +5,7 @@ import ChartsComp from "./ChartsComp";
 import AllJobLists from "./AllJobLists";
 import { useNavigate } from "react-router-dom";
 import { ApplicationBoard } from "./ApplicationBoard";
+import DataqueueWidget from "./DataqueueWidget";
 
 const colors = {
     bg: "#0f1214",
@@ -54,7 +55,7 @@ const Sidebar = ({ active, onChange, onLogout }) => {
     );
 };
 
-const API_KEY = "b4232c55e1msh2fa179ace936293p15516djsn3b98c2ac71c2";
+// const API_KEY = "b27bf81962msh2dc1c8dd3e76dbap115272jsn15c387f7ff80";
 const API_HOST = "jsearch.p.rapidapi.com";
 
 const processJobData = (jobs) => {
@@ -262,6 +263,7 @@ const UserHomePage = () => {
 
     return (
         <div className="bg-[#0f1214] min-h-screen pl-64">
+            <DataqueueWidget />
             <Sidebar active={page} onChange={setPage} onLogout={handleLogout} />
             <main className="p-8 text-white min-h-screen">
                 <h1 className="text-3xl font-bold mb-6">Welcome back {user?.firstName || "👋"}</h1>
