@@ -187,12 +187,23 @@ export default function ApplyComponent() {
                                 />
                             </div>
 
-                            <button
-                                type="submit"
-                                className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl font-semibold transition-all shadow-sm hover:shadow-lg"
-                            >
-                                Submit Application
-                            </button>
+                            <div className="space-y-3 mt-4">
+                                <button
+                                    type="submit"
+                                    className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl font-semibold transition-all shadow-sm hover:shadow-lg"
+                                >
+                                    Submit Application
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => navigate(-1)} // or use navigate("/user_home")
+                                    className="w-full px-6 py-3 border border-red-500 text-red-400 hover:text-white hover:bg-red-600 rounded-xl font-semibold transition-all shadow-sm hover:shadow-lg"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+
                         </div>
                     </form>
                 </div>
