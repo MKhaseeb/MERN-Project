@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 const JobInsightsWriter = ({ allJobs }) => {
     const [article, setArticle] = useState('');
     const [loading, setLoading] = useState(false);
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+
 
     useEffect(() => {
         if (!allJobs || allJobs.length === 0) return;
@@ -14,7 +16,7 @@ const JobInsightsWriter = ({ allJobs }) => {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer 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`,
+                        'Authorization': `Bearer ${apiKey}`,
                     },
                     body: JSON.stringify({
                         model: "gpt-4",
@@ -64,7 +66,7 @@ const JobInsightsWriter = ({ allJobs }) => {
                             <div className="w-12 h-12 border-4 border-[#2c343c] border-t-blue-500 rounded-full animate-spin"></div>
                             <div className="absolute inset-0 w-12 h-12 border-4 border-transparent border-r-purple-500 rounded-full animate-spin animation-delay-75"></div>
                         </div>
-                        
+
                         {/* Loading Text with Typewriter Effect */}
                         <div className="text-center">
                             <h3 className="text-lg font-semibold text-white mb-2">
@@ -88,7 +90,7 @@ const JobInsightsWriter = ({ allJobs }) => {
                                 <span>Generating Report</span>
                             </div>
                             <div className="w-full bg-[#2c343c] rounded-full h-1">
-                                <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-1 rounded-full animate-pulse" style={{width: '70%'}}></div>
+                                <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-1 rounded-full animate-pulse" style={{ width: '70%' }}></div>
                             </div>
                         </div>
                     </div>
@@ -120,7 +122,7 @@ const JobInsightsWriter = ({ allJobs }) => {
                     <div className="p-6">
                         {article ? (
                             <div className="prose prose-invert max-w-none">
-                                <div 
+                                <div
                                     className="text-gray-300 leading-relaxed text-base"
                                     style={{
                                         lineHeight: '1.7',
@@ -177,7 +179,7 @@ const JobInsightsWriter = ({ allJobs }) => {
                                         return null;
                                     })}
                                 </div>
-                                
+
                                 {/* Article Footer */}
                                 <div className="mt-8 pt-6 border-t border-[#2c343c]">
                                     <div className="flex items-center justify-between">
