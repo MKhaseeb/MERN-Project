@@ -18,6 +18,7 @@ import { DataqueueWidget } from './Components/DataqueueWidget';
 import CreateJobPage from './Components/CreateJobPage';
 import ApplyComponent from './Components/ApplyComponent';
 import { ApplicationBoard } from './Components/ApplicationBoard';
+import ApplicationPage from './Components/ApplicationPage';
 
 function App() {
   // const userId = localStorage.getItem("userId"); 
@@ -42,7 +43,7 @@ const [userId, setUserId] = useState(storedUserId);
       <Route path="/queue" element={<DataqueueWidget/>} />
 
       <Route path="/apply/:id" element={<ApplyComponent/>} />
-      <Route path="/board" element={<ApplicationBoard userId={userId} />} />
+      <Route path="/board" element={<ApplicationPage userId={userId} />} />
     </Routes>
   )
 }

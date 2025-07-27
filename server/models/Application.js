@@ -41,7 +41,13 @@ const ApplicationSchema = new Schema({
             d.setHours(0, 0, 0, 0);
             return d;
         }
-    }
+    },
+    status: {
+        type: String,
+        enum: ["wishlist", "applied", "interview", "offer", "rejected"],
+        default: "applied"
+    },
+
 }, { timestamps: true });
 
 module.exports = mongoose.model("Application", ApplicationSchema);
