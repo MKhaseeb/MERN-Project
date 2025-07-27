@@ -40,6 +40,8 @@ module.exports = function (app) {
         JobController.applyToJob        // Controller
     );
     app.get('/api/jobs/:jobId/applicants', JobController.getApplicantsForJob);
+    app.put('/api/jobs/:jobId/applications/:userId/status', JobController.updateApplicationStatus);
+
 
 
 
