@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Briefcase } from "lucide-react";
 
-export const SortableItem = ({ id, title }) => {
+export const SortableItem = ({ id, title, onClick }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
 
@@ -13,6 +13,20 @@ export const SortableItem = ({ id, title }) => {
   };
 
   const [jobTitle, company] = title.split(" @ ");
+  const timerRef = useRef(null);
+
+  const handleClick = (e) => {
+    // Delay to avoid triggering on drag
+    timerRef.current = setTimeout(() => {
+      onClick?.();
+    }, 200);
+  };
+
+  const handleDragStart = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+  };
 
   return (
     <div
@@ -20,6 +34,8 @@ export const SortableItem = ({ id, title }) => {
       style={style}
       {...attributes}
       {...listeners}
+      onClick={handleClick}
+      onDragStart={handleDragStart}
       className="bg-[#1b1f27] p-3 rounded-md border border-[#2d2f33] text-sm text-white cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition"
     >
       <h4 className="font-semibold leading-snug text-white mb-1">{jobTitle}</h4>

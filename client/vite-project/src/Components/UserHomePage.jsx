@@ -4,6 +4,7 @@ import { FaUser, FaSignOutAlt, FaBookmark, FaBriefcase, FaBell, FaClipboardList,
 import ChartsComp from "./ChartsComp";
 import AllJobLists from "./AllJobLists";
 import { useNavigate } from "react-router-dom";
+import { ApplicationBoard } from "./ApplicationBoard";
 
 const colors = {
     bg: "#0f1214",
@@ -22,34 +23,35 @@ const Sidebar = ({ active, onChange, onLogout }) => {
             navigate("/allJobs");
         }
     };
-    return(
-    <div className="h-screen w-64 bg-[#1c1f23] text-white p-6 flex flex-col justify-between fixed left-0 top-0">
-        <div className="space-y-4">
-            <h1 className="text-xl font-bold mb-6">Job Plus</h1>
-            {[
-                { icon: <FaWarehouse />, label: "Home", key: "home" },
-                { icon: <FaUser />, label: "Profile", key: "profile" },
-                { icon: <FaBriefcase />, label: "Applications", key: "applications" },
-                { icon: <FaBriefcase />, label: "Insights", key: "charts" },
-            ].map(({ icon, label, key }) => (
-                <button
-                    key={key}
-                    onClick={() => handleClick(key)}
-                    className={`flex items-center gap-2 p-3 w-full rounded-xl transition duration-200 ${active === key ? "bg-[#161a1d]" : "hover:bg-[#2c343c]"
-                        }`}
-                >
-                    {icon} {label}
-                </button>
-            ))}
+    return (
+        <div className="h-screen w-64 bg-[#1c1f23] text-white p-6 flex flex-col justify-between fixed left-0 top-0">
+            <div className="space-y-4">
+                <h1 className="text-xl font-bold mb-6">Job Plus</h1>
+                {[
+                    { icon: <FaWarehouse />, label: "Home", key: "home" },
+                    { icon: <FaUser />, label: "Profile", key: "profile" },
+                    { icon: <FaBriefcase />, label: "Applications", key: "applications" },
+                    { icon: <FaClipboardList />, label: "Application Board", key: "board" },
+                    { icon: <FaBriefcase />, label: "Insights", key: "charts" },
+                ].map(({ icon, label, key }) => (
+                    <button
+                        key={key}
+                        onClick={() => handleClick(key)}
+                        className={`flex items-center gap-2 p-3 w-full rounded-xl transition duration-200 ${active === key ? "bg-[#161a1d]" : "hover:bg-[#2c343c]"
+                            }`}
+                    >
+                        {icon} {label}
+                    </button>
+                ))}
+            </div>
+            <button
+                onClick={onLogout}
+                className="flex items-center gap-2 p-3 w-full rounded-xl hover:bg-red-600 transition duration-200"
+            >
+                <FaSignOutAlt /> Logout
+            </button>
         </div>
-        <button
-            onClick={onLogout}
-            className="flex items-center gap-2 p-3 w-full rounded-xl hover:bg-red-600 transition duration-200"
-        >
-            <FaSignOutAlt /> Logout
-        </button>
-    </div>
-  );
+    );
 };
 
 const API_KEY = "b4232c55e1msh2fa179ace936293p15516djsn3b98c2ac71c2";
@@ -399,6 +401,17 @@ const UserHomePage = () => {
                         )}
 
                     </>
+                )}
+
+                {page === "board" && (
+                    <div className="bg-[#0f1214] rounded-xl">
+                        <ApplicationBoard
+                            userId={userId}
+                            onJobClick={(job) => {
+                                console.log("Clicked job", job); // optionally show modal or inline preview
+                            }}
+                        />
+                    </div>
                 )}
             </main>
         </div>
